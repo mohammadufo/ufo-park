@@ -6,13 +6,19 @@
   "scripts": {
     "format": "prettier  \"{apps,libs}/**/*.{ts,tsx,js,json}\" --ignore-path .gitignore",
     "format:check": "pnpm format --check",
-    "format:write": "pnpm format --write"
+    "format:write": "pnpm format --write",
+    "tsc": "pnpm --parallel -r run tsc",
+    "build": "pnpm --parallel -r run build",
+    "lint": "pnpm --parallel -r rub lint",
+    "validate": "pnpm format:write && pnpm tsc && pnpm lint && pnpm build",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "prettier": "^3.0.0",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "husky": "^8.0.0"
   }
 }
