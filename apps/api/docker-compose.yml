@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: ufopark_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1400
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data_ufopark:/var/lib/postgresql/data
+volumes:
+  db_data_ufopark:
