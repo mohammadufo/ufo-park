@@ -16,13 +16,13 @@ export class UsersResolver {
     private readonly prisma: PrismaService,
   ) {}
 
-  @AllowAuthenticated()
+  // @AllowAuthenticated()
   @Mutation(() => User)
   createUser(
     @Args('createUserInput') args: CreateUserInput,
     @GetUser() user: GetUserType,
   ) {
-    checkRowLevelPermission(user, args.uid)
+    // checkRowLevelPermission(user, args.uid)
     return this.usersService.create(args)
   }
 
