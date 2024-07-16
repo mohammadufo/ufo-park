@@ -1,10 +1,19 @@
-import { Field, InputType, PartialType } from '@nestjs/graphql'
-import { Prisma } from '@prisma/client'
+import {
+  Field,
+  InputType,
+  PartialType,
+  registerEnumType,
+} from '@nestjs/graphql'
+import { AuthProviderType, Prisma } from '@prisma/client'
 import {
   DateTimeFilter,
   RestrictProperties,
   StringFilter,
 } from 'src/common/dtos/common.input'
+
+registerEnumType(AuthProviderType, {
+  name: 'AuthProviderType',
+})
 
 @InputType()
 export class UserWhereUniqueInput {

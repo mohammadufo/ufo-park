@@ -32,12 +32,14 @@
     "@nestjs/swagger": "^7.4.0",
     "@prisma/client": "5.16.1",
     "@ufopark/sample-lib": "workspace:^",
+    "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "graphql": "^16.9.0",
     "prisma": "^5.16.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
