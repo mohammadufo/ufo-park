@@ -10,7 +10,7 @@
     "tsc": "tsc --noEmit"
   },
   "dependencies": {
-    "@ufopark/sample-lib": "workspace:^",
+    "@ufopark/sample-lib": "*",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18"
