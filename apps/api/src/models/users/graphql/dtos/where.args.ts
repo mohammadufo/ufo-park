@@ -1,9 +1,4 @@
-import {
-  Field,
-  InputType,
-  PartialType,
-  registerEnumType,
-} from '@nestjs/graphql'
+import { InputType, PartialType, registerEnumType } from '@nestjs/graphql'
 import { AuthProviderType, Prisma } from '@prisma/client'
 import {
   DateTimeFilter,
