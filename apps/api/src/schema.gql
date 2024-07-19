@@ -151,6 +151,19 @@ type Verification {
   adminId: String!
 }
 
+type User {
+  name: String
+  image: String
+  uid: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type LoginOutput {
+  token: String!
+  user: User!
+}
+
 type Query {
   admins(distinct: [AdminScalarFieldEnum!], where: AdminWhereInput, orderBy: [AdminOrderByWithRelationInput!], cursor: AdminWhereUniqueInput, take: Int, skip: Int): [Admin!]!
   admin(where: AdminWhereUniqueInput!): Admin!
@@ -178,6 +191,9 @@ type Query {
   review(where: ReviewWhereUniqueInput!): Review!
   verifications(distinct: [VerificationScalarFieldEnum!], where: VerificationWhereInput, orderBy: [VerificationOrderByWithRelationInput!], cursor: VerificationWhereUniqueInput, take: Int, skip: Int): [Verification!]!
   verification(where: VerificationWhereUniqueInput!): Verification!
+  whoami: User!
+  users(distinct: [UserScalarFieldEnum!], where: UserWhereInput, orderBy: [UserOrderByWithRelationInput!], cursor: UserWhereUniqueInput, take: Int, skip: Int): [User!]!
+  user(where: UserWhereUniqueInput!): User!
 }
 
 enum AdminScalarFieldEnum {
@@ -966,6 +982,18 @@ input VerificationWhereUniqueInput {
   garageId: Int!
 }
 
+enum UserScalarFieldEnum {
+  uid
+  createdAt
+  updatedAt
+  name
+  image
+}
+
+input UserWhereUniqueInput {
+  uid: String!
+}
+
 type Mutation {
   createAdmin(createAdminInput: CreateAdminInput!): Admin!
   updateAdmin(updateAdminInput: UpdateAdminInput!): Admin!
@@ -1006,6 +1034,11 @@ type Mutation {
   createVerification(createVerificationInput: CreateVerificationInput!): Verification!
   updateVerification(updateVerificationInput: UpdateVerificationInput!): Verification!
   removeVerification(where: VerificationWhereUniqueInput!): Verification!
+  registerWithCredentials(registerWithCredentialsInput: RegisterWithCredentialsInput!): User!
+  registerWithProvider(registerWithProviderInput: RegisterWithProviderInput!): User!
+  login(loginInput: LoginInput!): LoginOutput!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(where: UserWhereUniqueInput!): User!
 }
 
 input CreateAdminInput {
@@ -1205,4 +1238,32 @@ input UpdateVerificationInput {
   garageId: Int!
   verified: Boolean
   adminId: String
+}
+
+input RegisterWithCredentialsInput {
+  name: String!
+  email: String!
+  password: String!
+  image: String
+}
+
+input RegisterWithProviderInput {
+  name: String
+  image: String
+  uid: String!
+  type: AuthProviderType!
+}
+
+enum AuthProviderType {
+  GOOGLE
+  CREDENTIALS
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  uid: String!
 }

@@ -11,4 +11,3 @@ export class ValetQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.ValetScalarFieldEnum))
   searchBy?: string
 }
-

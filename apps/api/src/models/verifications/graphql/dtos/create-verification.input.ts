@@ -1,4 +1,4 @@
-import { InputType, OmitType, PickType } from '@nestjs/graphql'
+import { InputType, OmitType } from '@nestjs/graphql'
 import { Verification } from '../entity/verification.entity'
 
 @InputType()

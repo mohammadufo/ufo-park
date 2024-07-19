@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql'
 import { User } from '../entity/user.entity'
-import { AuthProviderType, SlotType } from '@prisma/client'
+import { AuthProviderType } from '@prisma/client'
 
 @InputType()
 export class RegisterWithProviderInput extends PickType(

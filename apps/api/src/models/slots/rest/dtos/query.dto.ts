@@ -11,4 +11,3 @@ export class SlotQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.SlotScalarFieldEnum))
   searchBy?: string
 }
-

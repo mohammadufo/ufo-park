@@ -5,4 +5,3 @@ import { BookingTimeline } from '@prisma/client'
 export class UpdateBookingTimeline extends PartialType(CreateBookingTimeline) {
   id: BookingTimeline['id']
 }
-

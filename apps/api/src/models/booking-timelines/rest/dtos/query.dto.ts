@@ -11,4 +11,3 @@ export class BookingTimelineQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.BookingTimelineScalarFieldEnum))
   searchBy?: string
 }
-

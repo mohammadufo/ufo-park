@@ -11,4 +11,3 @@ export class AddressQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.AddressScalarFieldEnum))
   searchBy?: string
 }
-

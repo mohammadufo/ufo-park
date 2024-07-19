@@ -1,4 +1,4 @@
-import { InputType, OmitType, PickType } from '@nestjs/graphql'
+import { InputType, OmitType } from '@nestjs/graphql'
 import { ValetAssignment } from '../entity/valet-assignment.entity'
 
 @InputType()

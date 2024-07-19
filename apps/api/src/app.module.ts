@@ -5,8 +5,6 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { join } from 'path'
 import { ConfigModule } from '@nestjs/config'
-import { PrismaModule } from './common/prisma/prisma.module'
-import { UsersModule } from './models/users/users.module'
 import { JwtModule } from '@nestjs/jwt'
 import { AdminsModule } from './models/admins/admins.module'
 import { CustomersModule } from './models/customers/customers.module'
@@ -21,6 +19,7 @@ import { ValetAssignmentsModule } from './models/valet-assignments/valet-assignm
 import { BookingTimelinesModule } from './models/booking-timelines/booking-timelines.module'
 import { ReviewsModule } from './models/reviews/reviews.module'
 import { VerificationsModule } from './models/verifications/verifications.module'
+import { UsersModule } from './models/users/users.module'
 
 const MAX_AGE = 24 * 60 * 60
 @Module({
@@ -55,6 +54,7 @@ const MAX_AGE = 24 * 60 * 60
     BookingTimelinesModule,
     ReviewsModule,
     VerificationsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

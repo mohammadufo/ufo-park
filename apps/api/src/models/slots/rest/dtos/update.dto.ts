@@ -5,4 +5,3 @@ import { Slot } from '@prisma/client'
 export class UpdateSlot extends PartialType(CreateSlot) {
   id: Slot['id']
 }
-

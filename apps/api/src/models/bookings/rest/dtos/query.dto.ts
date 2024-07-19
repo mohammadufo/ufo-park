@@ -11,4 +11,3 @@ export class BookingQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.BookingScalarFieldEnum))
   searchBy?: string
 }
-

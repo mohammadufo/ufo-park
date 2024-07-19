@@ -11,4 +11,3 @@ export class VerificationQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.VerificationScalarFieldEnum))
   searchBy?: string
 }
-

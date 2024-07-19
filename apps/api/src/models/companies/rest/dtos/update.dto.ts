@@ -5,4 +5,3 @@ import { Company } from '@prisma/client'
 export class UpdateCompany extends PartialType(CreateCompany) {
   id: Company['id']
 }
-

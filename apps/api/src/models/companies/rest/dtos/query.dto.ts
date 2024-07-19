@@ -11,4 +11,3 @@ export class CompanyQueryDto extends BaseQueryDto {
   @IsIn(Object.values(Prisma.CompanyScalarFieldEnum))
   searchBy?: string
 }
-
