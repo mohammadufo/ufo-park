@@ -51,7 +51,7 @@ export class AuthGuard implements CanActivate {
         )
       }
 
-      console.log('jwt payload: ', payload)
+      // console.log('jwt payload: ', payload)
       req.user = payload
     } catch (err) {
       console.error('Token validation error:', err)
@@ -68,13 +68,12 @@ export class AuthGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
     const requiredRoles = this.getMetadata<Role[]>('roles', context)
+    const userRoles = await this.getUserRoles(req.user.uid)
+    req.user.roles = userRoles
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true
     }
-
-    const userRoles = await this.getUserRoles(req.user.uid)
-    req.user.roles = userRoles
 
     return requiredRoles.some((role) => userRoles.includes(role))
   }
@@ -89,12 +88,16 @@ export class AuthGuard implements CanActivate {
   private async getUserRoles(uid: string): Promise<Role[]> {
     const roles: Role[] = []
 
-    const [admin] = await Promise.all([
+    const [admin, manager, valet] = await Promise.all([
       this.prisma.admin.findUnique({ where: { uid } }),
-
+      this.prisma.manager.findUnique({ where: { uid } }),
+      this.prisma.valet.findUnique({ where: { uid } }),
       // Add promises for other role models here
     ])
+
     admin && roles.push('admin')
+    manager && roles.push('manager')
+    valet && roles.push('valet')
 
     return roles
   }
