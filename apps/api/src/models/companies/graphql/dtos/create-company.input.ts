@@ -8,4 +8,5 @@ export class CreateCompanyInput extends OmitType(
   InputType,
 ) {
   managerId: string
+  managerName?: string
 }
