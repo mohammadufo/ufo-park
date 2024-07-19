@@ -1,5 +1,9 @@
 import { InputType, PartialType, registerEnumType } from '@nestjs/graphql'
 import { AuthProviderType, Prisma } from '@prisma/client'
+import { CustomerRelationFilter } from 'src/models/customers/graphql/dtos/where.args'
+import { ManagerRelationFilter } from 'src/models/managers/graphql/dtos/where.args'
+import { ValetRelationFilter } from 'src/models/valets/graphql/dtos/where.args'
+
 import {
   DateTimeFilter,
   RestrictProperties,
@@ -26,6 +30,9 @@ export class UserWhereInputStrict
       >
     >
 {
+  Customer: CustomerRelationFilter
+  Manager: ManagerRelationFilter
+  Valet: ValetRelationFilter
   uid: StringFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
