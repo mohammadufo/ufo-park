@@ -139,6 +139,8 @@ type Slot {
   updatedAt: DateTime!
   pricePerHour: Int!
   garageId: Int!
+  garage: Garage!
+  bookings: [Booking!]!
 }
 
 enum SlotType {
