@@ -6,6 +6,9 @@ type Admin {
   uid: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  user: User
+  verifications: [Verification!]!
+  verificationsCount: Int!
 }
 
 """
@@ -13,11 +16,59 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type User {
+  name: String
+  image: String
+  uid: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  admin: Admin
+  manager: Manager
+  valet: Valet
+  customer: Customer
+}
+
+type Verification {
+  createdAt: DateTime!
+  garageId: Int!
+  updatedAt: DateTime!
+  verified: Boolean!
+  adminId: String!
+}
+
 type Customer {
   displayName: String
   uid: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  user: User
+  bookings: [Booking!]!
+}
+
+type Booking {
+  pricePerHour: Int
+  totalPrice: Int
+  phoneNumber: String
+  passcode: String
+  status: BookingStatus!
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  startTime: DateTime!
+  endTime: DateTime!
+  vehicleNumber: String!
+  slotId: Int!
+  customerId: String!
+}
+
+enum BookingStatus {
+  BOOKED
+  VALET_ASSIGNED_FOR_CHECK_IN
+  VALET_PICKED_UP
+  CHECKED_IN
+  VALET_ASSIGNED_FOR_CHECK_OUT
+  CHECKED_OUT
+  VALET_RETURNED
 }
 
 type Manager {
@@ -86,32 +137,6 @@ enum SlotType {
   BICYCLE
 }
 
-type Booking {
-  pricePerHour: Int
-  totalPrice: Int
-  phoneNumber: String
-  passcode: String
-  status: BookingStatus!
-  id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  startTime: DateTime!
-  endTime: DateTime!
-  vehicleNumber: String!
-  slotId: Int!
-  customerId: String!
-}
-
-enum BookingStatus {
-  BOOKED
-  VALET_ASSIGNED_FOR_CHECK_IN
-  VALET_PICKED_UP
-  CHECKED_IN
-  VALET_ASSIGNED_FOR_CHECK_OUT
-  CHECKED_OUT
-  VALET_RETURNED
-}
-
 type ValetAssignment {
   returnLat: Int
   returnLng: Int
@@ -141,26 +166,6 @@ type Review {
   rating: Int!
   customerId: String!
   garageId: Int!
-}
-
-type Verification {
-  createdAt: DateTime!
-  garageId: Int!
-  updatedAt: DateTime!
-  verified: Boolean!
-  adminId: String!
-}
-
-type User {
-  name: String
-  image: String
-  uid: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  admin: Admin
-  manager: Manager
-  valet: Valet
-  customer: Customer
 }
 
 type LoginOutput {
