@@ -101,6 +101,10 @@ type Garage {
   updatedAt: DateTime!
   images: [String!]!
   companyId: Int!
+  verification: Verification
+  company: Company!
+  address: Address
+  slots: [Slot!]!
 }
 
 type Valet {
