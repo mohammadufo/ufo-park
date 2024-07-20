@@ -59,6 +59,9 @@ type Booking {
   vehicleNumber: String!
   slotId: Int!
   customerId: String!
+  slot: Slot!
+  customer: Customer!
+  valetAssignment: ValetAssignment
 }
 
 enum BookingStatus {
