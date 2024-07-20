@@ -115,6 +115,7 @@ type Address {
   address: String!
   lat: Int!
   lng: Int!
+  garage: Garage
 }
 
 type Slot {
