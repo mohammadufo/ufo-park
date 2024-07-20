@@ -80,6 +80,7 @@ type Manager {
   createdAt: DateTime!
   updatedAt: DateTime!
   companyId: Int!
+  company: Company
 }
 
 type Company {
@@ -88,16 +89,8 @@ type Company {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-}
-
-type Valet {
-  image: String
-  companyId: Int
-  uid: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  displayName: String!
-  licenceID: String!
+  garages: [Garage!]!
+  managers: [Manager!]!
 }
 
 type Garage {
@@ -108,6 +101,16 @@ type Garage {
   updatedAt: DateTime!
   images: [String!]!
   companyId: Int!
+}
+
+type Valet {
+  image: String
+  companyId: Int
+  uid: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  displayName: String!
+  licenceID: String!
 }
 
 type Address {
