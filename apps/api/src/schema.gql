@@ -160,6 +160,8 @@ type ValetAssignment {
   pickupLng: Int!
   pickupValetId: String!
   returnValetId: String!
+  pickupValet: Valet
+  returnValet: Valet
 }
 
 type BookingTimeline {
