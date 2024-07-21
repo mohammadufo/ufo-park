@@ -8,7 +8,7 @@ export default function Home() {
   const { data, loading } = useQuery(CompaniesDocument)
 
   return (
-    <main>
+    <main className="bg-primary">
       I love Alaa 💕
       <span>{add(2, 6)}</span>
       <div>

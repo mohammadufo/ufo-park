@@ -1,1 +1,1 @@
-import '@autospace/network/next-auth'
+import '@ufopark/network/next-auth'

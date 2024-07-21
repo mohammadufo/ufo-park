@@ -10,6 +10,7 @@
     "tsc": "tsc --noEmit"
   },
   "dependencies": {
+    "@ufopark/ui": "*",
     "@ufopark/network": "*",
     "@ufopark/sample-lib": "*",
     "next": "14.2.4",
