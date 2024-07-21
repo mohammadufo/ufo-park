@@ -147,7 +147,6 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user = {
           image: token.picture,
-          //@ts-ignore
           uid: (token.uid as string) || '',
           email: token.email,
           name: token.name,
