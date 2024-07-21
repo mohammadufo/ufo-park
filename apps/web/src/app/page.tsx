@@ -7,8 +7,6 @@ import { CompaniesDocument } from '@ufopark/network/src/gql/generated'
 export default function Home() {
   const { data, loading } = useQuery(CompaniesDocument)
 
-  console.log('data --->', data)
-
   return (
     <main>
       I love Alaa 💕
