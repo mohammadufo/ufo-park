@@ -28,6 +28,16 @@ type User {
   customer: Customer
 }
 
+type AuthProvider {
+  type: AuthProviderType!
+  uid: String!
+}
+
+enum AuthProviderType {
+  GOOGLE
+  CREDENTIALS
+}
+
 type Verification {
   createdAt: DateTime!
   garageId: Int!
@@ -218,6 +228,7 @@ type Query {
   whoami: User!
   users(distinct: [UserScalarFieldEnum!], where: UserWhereInput, orderBy: [UserOrderByWithRelationInput!], cursor: UserWhereUniqueInput, take: Int, skip: Int): [User!]!
   user(where: UserWhereUniqueInput!): User!
+  getAuthProvider(uid: String!): AuthProvider
 }
 
 enum AdminScalarFieldEnum {
@@ -1278,11 +1289,6 @@ input RegisterWithProviderInput {
   image: String
   uid: String!
   type: AuthProviderType!
-}
-
-enum AuthProviderType {
-  GOOGLE
-  CREDENTIALS
 }
 
 input LoginInput {
