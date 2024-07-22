@@ -1,8 +1,50 @@
 -- CreateEnum
+CREATE TYPE "AuthProviderType" AS ENUM ('GOOGLE', 'CREDENTIALS');
+
+-- CreateEnum
 CREATE TYPE "SlotType" AS ENUM ('CAR', 'HEAVY', 'BIKE', 'BICYCLE');
 
 -- CreateEnum
 CREATE TYPE "BookingStatus" AS ENUM ('BOOKED', 'VALET_ASSIGNED_FOR_CHECK_IN', 'VALET_PICKED_UP', 'CHECKED_IN', 'VALET_ASSIGNED_FOR_CHECK_OUT', 'CHECKED_OUT', 'VALET_RETURNED');
+
+-- CreateTable
+CREATE TABLE "User" (
+    "uid" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT,
+    "image" TEXT,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
+CREATE TABLE "Admin" (
+    "uid" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Admin_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
+CREATE TABLE "Credentials" (
+    "uid" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Credentials_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
+CREATE TABLE "AuthProvider" (
+    "uid" TEXT NOT NULL,
+    "type" "AuthProviderType" NOT NULL,
+
+    CONSTRAINT "AuthProvider_pkey" PRIMARY KEY ("uid")
+);
 
 -- CreateTable
 CREATE TABLE "Customer" (
@@ -162,6 +204,9 @@ CREATE TABLE "Verification" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Credentials_email_key" ON "Credentials"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Manager_companyId_key" ON "Manager"("companyId");
 
 -- CreateIndex
@@ -175,6 +220,15 @@ CREATE INDEX "Booking_startTime_endTime_idx" ON "Booking"("startTime", "endTime"
 
 -- CreateIndex
 CREATE INDEX "BookingTimeline_bookingId_idx" ON "BookingTimeline"("bookingId");
+
+-- AddForeignKey
+ALTER TABLE "Admin" ADD CONSTRAINT "Admin_uid_fkey" FOREIGN KEY ("uid") REFERENCES "User"("uid") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Credentials" ADD CONSTRAINT "Credentials_uid_fkey" FOREIGN KEY ("uid") REFERENCES "User"("uid") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AuthProvider" ADD CONSTRAINT "AuthProvider_uid_fkey" FOREIGN KEY ("uid") REFERENCES "User"("uid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Customer" ADD CONSTRAINT "Customer_uid_fkey" FOREIGN KEY ("uid") REFERENCES "User"("uid") ON DELETE RESTRICT ON UPDATE CASCADE;

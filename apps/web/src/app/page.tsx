@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client'
 import { CompaniesDocument } from '@ufopark/network/src/gql/generated'
 import { BrandIcon } from '@ufopark/ui/src/components/atoms/BrandIcon'
 import { Button } from '@ufopark/ui/src/components/atoms/Button'
+import { HtmlInput } from '@ufopark/ui/src/components/atoms/HtmlInput'
 
 export default function Home() {
   const { data, loading } = useQuery(CompaniesDocument)
@@ -12,9 +13,11 @@ export default function Home() {
   return (
     <main className="">
       <BrandIcon />
-      <Button variant="outlined" loading>
-        I love Alaa 💕
+      <Button variant="outlined">I love Alaa 💕</Button>
+      <Button variant="contained" loading>
+        test
       </Button>
+      <HtmlInput />
       <span>{add(2, 6)}</span>
       <div>
         <span>compony list</span>
