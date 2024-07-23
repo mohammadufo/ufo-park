@@ -1278,10 +1278,10 @@ input UpdateVerificationInput {
 }
 
 input RegisterWithCredentialsInput {
-  name: String!
+  name: String
+  image: String
   email: String!
   password: String!
-  image: String
 }
 
 input RegisterWithProviderInput {

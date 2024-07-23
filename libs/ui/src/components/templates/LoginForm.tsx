@@ -44,7 +44,7 @@ export const LoginForm = ({ className }: ILoginFormProps) => {
       <HtmlLabel title="Email" error={errors.email?.message}>
         <HtmlInput {...register('email')} placeholder="email" />
       </HtmlLabel>
-      <HtmlLabel title="Password" error={errors.password?.message} optional>
+      <HtmlLabel title="Password" error={errors.password?.message}>
         <HtmlInput
           type="password"
           {...register('password')}
@@ -53,7 +53,7 @@ export const LoginForm = ({ className }: ILoginFormProps) => {
       </HtmlLabel>
       <Button type="submit">Sumbit</Button>
       <div className="mt-4 text-sm">
-        Do not have an autospace account?
+        Do not have an UFO Park account?
         <br />
         <Link
           href="/register"
