@@ -3,6 +3,7 @@
 import { Inter } from 'next/font/google'
 import { ApolloProvider } from '@ufopark/network/src/config/apollo'
 import '@ufopark/ui/src/app/globals.css'
+import { SessionProvider } from '@ufopark/ui/src/components/molecules/SessionProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,9 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ApolloProvider>
-        <body className={inter.className}>{children}</body>
-      </ApolloProvider>
+      <SessionProvider>
+        <ApolloProvider>
+          <body className={inter.className}>{children}</body>
+        </ApolloProvider>
+      </SessionProvider>
     </html>
   )
 }

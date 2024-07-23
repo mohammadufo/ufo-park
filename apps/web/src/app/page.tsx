@@ -6,18 +6,26 @@ import { CompaniesDocument } from '@ufopark/network/src/gql/generated'
 import { BrandIcon } from '@ufopark/ui/src/components/atoms/BrandIcon'
 import { Button } from '@ufopark/ui/src/components/atoms/Button'
 import { HtmlInput } from '@ufopark/ui/src/components/atoms/HtmlInput'
+import { useSession, signOut } from 'next-auth/react'
+import Link from 'next/link'
 
 export default function Home() {
   const { data, loading } = useQuery(CompaniesDocument)
+
+  const { data: sessionData, status } = useSession()
 
   return (
     <main className="">
       <BrandIcon />
       <Button variant="outlined">I love Alaa 💕</Button>
-      <Button variant="contained" loading>
-        test
-      </Button>
-      <HtmlInput />
+
+      <div>
+        {sessionData?.user?.uid ? (
+          <Button onClick={() => signOut()}>Signout</Button>
+        ) : (
+          <Link href="/login">Login</Link>
+        )}
+      </div>
       <span>{add(2, 6)}</span>
       <div>
         <span>compony list</span>
