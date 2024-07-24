@@ -5,5 +5,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const getCookies = cookies()
   const nextAuthSession = getCookies.get('next-auth.session-token')?.value || ''
 
+  console.log('nextAuthSession')
+
   return NextResponse.json(nextAuthSession)
 }

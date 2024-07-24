@@ -37,6 +37,7 @@ export class CompaniesResolver {
     return this.companiesService.create(args)
   }
 
+  @AllowAuthenticated()
   @Query(() => [Company], { name: 'companies' })
   findAll(@Args() args: FindManyCompanyArgs) {
     return this.companiesService.findAll(args)
