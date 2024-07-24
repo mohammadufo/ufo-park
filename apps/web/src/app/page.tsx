@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client'
 import { CompaniesDocument } from '@ufopark/network/src/gql/generated'
 import { BrandIcon } from '@ufopark/ui/src/components/atoms/BrandIcon'
 import { Button } from '@ufopark/ui/src/components/atoms/Button'
-import { HtmlInput } from '@ufopark/ui/src/components/atoms/HtmlInput'
+import { Sidebar } from '@ufopark/ui/src/components/organisms/Sidebar'
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -25,6 +25,9 @@ export default function Home() {
         ) : (
           <Link href="/login">Login</Link>
         )}
+      </div>
+      <div className="p-12">
+        <Sidebar>Children...</Sidebar>
       </div>
       <span>{add(2, 6)}</span>
       <div>
