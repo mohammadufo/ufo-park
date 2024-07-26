@@ -13,6 +13,7 @@ import { HtmlInput } from '../atoms/HtmlInput'
 import { SearchPlaceBox } from '../organisms/map/SearchPlacesBox'
 import { FormTypeSearchGarage } from '@ufopark/forms/src/searchGarages'
 import { ShowGarages } from '../organisms/search/ShowGarages'
+import { FilterSidebar } from '../organisms/search/FilterSidebar'
 
 export const SearchPage = () => {
   const { register, setValue, watch } = useFormContext<FormTypeSearchGarage>()
@@ -73,6 +74,9 @@ export const SearchPage = () => {
       </Panel>
       <Panel position="right-center">
         <DefaultZoomControls />
+      </Panel>
+      <Panel position="right-top">
+        <FilterSidebar />
       </Panel>
     </Map>
   )
