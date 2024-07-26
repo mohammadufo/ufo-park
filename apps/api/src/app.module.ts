@@ -37,9 +37,9 @@ const MAX_AGE = 24 * 60 * 60
       introspection: true,
       fieldResolverEnhancers: ['guards'],
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      buildSchemaOptions: {
-        numberScalarMode: 'integer',
-      },
+      // buildSchemaOptions: {
+      //   numberScalarMode: 'integer',
+      // },
     }),
     AdminsModule,
     CustomersModule,
