@@ -12,6 +12,7 @@ import { toLocalISOString } from '@ufopark/util/date'
 import { HtmlInput } from '../atoms/HtmlInput'
 import { SearchPlaceBox } from '../organisms/map/SearchPlacesBox'
 import { FormTypeSearchGarage } from '@ufopark/forms/src/searchGarages'
+import { ShowGarages } from '../organisms/search/ShowGarages'
 
 export const SearchPage = () => {
   const { register, setValue, watch } = useFormContext<FormTypeSearchGarage>()
@@ -41,6 +42,7 @@ export const SearchPage = () => {
       onZoomEnd={(e) => handleMapChange(e.target)}
       initialViewState={initialViewState}
     >
+      <ShowGarages />
       <Panel position="left-top">
         <div className="flex flex-col items-stretch">
           <SearchPlaceBox />

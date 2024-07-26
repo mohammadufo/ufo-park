@@ -1,5 +1,4 @@
 'use client'
-
 import { SearchPage } from '@ufopark/ui/src/components/templates/SearchPage'
 import { FormProviderSearchGarage } from '@ufopark/forms/src/searchGarages'
 
