@@ -1,5 +1,6 @@
 'use client'
 import { FormTypeBookSlot } from '@ufopark/forms/src/bookSlot'
+import { loadStripe } from '@stripe/stripe-js'
 
 import {
   CreateBookingInput,
@@ -65,6 +66,36 @@ export const BookSlotPopup = ({
             alert('You are not logged in.')
             return
           }
+          const bookingData: CreateBookingInput = {
+            phoneNumber: data.phoneNumber,
+            customerId: uid,
+            endTime: data.endTime,
+            startTime: data.startTime,
+            type: data.type,
+            garageId: garage.id,
+            vehicleNumber: data.vehicleNumber,
+            totalPrice,
+            pricePerHour,
+            ...(data.valet?.pickupInfo && data.valet?.dropoffInfo
+              ? {
+                  valetAssignment: {
+                    pickupLat: data.valet?.pickupInfo?.lat,
+                    pickupLng: data.valet?.pickupInfo?.lng,
+                    returnLat: data.valet?.dropoffInfo?.lat,
+                    returnLng: data.valet?.dropoffInfo?.lng,
+                  },
+                }
+              : null),
+          }
+
+          setBooking(true)
+          // Create booking session
+          const res = await createBookingSession(
+            uid!,
+            totalPriceObj,
+            bookingData,
+          )
+          setBooking(false)
         })}
       >
         <div className="flex items-start gap-2">
@@ -190,4 +221,32 @@ export const BookSlotPopup = ({
       </Form>
     </div>
   )
+}
+
+export const createBookingSession = async (
+  uid: string,
+  totalPriceObj: TotalPrice,
+  bookingData: CreateBookingInput,
+) => {
+  const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/stripe', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      totalPriceObj,
+      uid,
+      bookingData,
+    }),
+  })
+  const checkoutSession = await response.json()
+
+  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+  const stripe = await loadStripe(publishableKey || '')
+  const result = await stripe?.redirectToCheckout({
+    sessionId: checkoutSession.sessionId,
+  })
+
+  return result
 }

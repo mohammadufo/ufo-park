@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.13.0",
     "@headlessui/react": "^2.1.2",
     "@mui/material": "^5.16.5",
+    "@stripe/stripe-js": "^4.1.0",
     "@ufopark/forms": "*",
     "@ufopark/util": "*",
     "mapbox-gl": "^3.5.2",

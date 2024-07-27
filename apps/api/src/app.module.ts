@@ -20,6 +20,8 @@ import { BookingTimelinesModule } from './models/booking-timelines/booking-timel
 import { ReviewsModule } from './models/reviews/reviews.module'
 import { VerificationsModule } from './models/verifications/verifications.module'
 import { UsersModule } from './models/users/users.module'
+import { StripeModule } from './models/stripe/stripe.module'
+import { PrismaModule } from './common/prisma/prisma.module'
 
 const MAX_AGE = 24 * 60 * 60
 @Module({
@@ -41,6 +43,11 @@ const MAX_AGE = 24 * 60 * 60
       //   numberScalarMode: 'integer',
       // },
     }),
+
+    PrismaModule,
+
+    StripeModule,
+
     AdminsModule,
     CustomersModule,
     ManagersModule,
