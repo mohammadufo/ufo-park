@@ -4,6 +4,7 @@ import '@ufopark/ui/src/app/globals.css'
 import { SessionProvider } from '@ufopark/ui/src/components/molecules/SessionProvider'
 import { Header } from '@ufopark/ui/src/components/organisms/Header'
 import { MenuItem } from '@ufopark/util/types'
+import { ToastContainer } from '@ufopark/ui/src/components/molecules/Toast'
 import { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -31,6 +32,7 @@ export default function RootLayout({
           <body className={inter.className}>
             <Header menuItems={MENUITEMS} />
             {children}
+            <ToastContainer />
           </body>
         </ApolloProvider>
       </SessionProvider>
