@@ -1,4 +1,4 @@
-import { Field, Float, InputType, OmitType, PickType } from '@nestjs/graphql'
+import { Field, Float, InputType, PickType } from '@nestjs/graphql'
 import { Booking } from '../entity/booking.entity'
 import { Garage, SlotType } from '@prisma/client'
 
