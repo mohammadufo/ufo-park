@@ -7,3 +7,11 @@ export class CreateValetAssignmentInput extends OmitType(
   ['createdAt', 'updatedAt'],
   InputType,
 ) {}
+
+@InputType()
+export class CreateValetAssignmentInputWithoutBookingId {
+  pickupLat: number
+  pickupLng: number
+  returnLat?: number
+  returnLng?: number
+}
