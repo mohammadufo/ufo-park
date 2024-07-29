@@ -33,7 +33,7 @@ export class GaragesService {
       })
       const slotsByType = this.groupSlotsByType(Slots, createdGarage.id)
 
-      const createSlots = await tx.slot.createMany({
+      await tx.slot.createMany({
         data: slotsByType,
       })
 
@@ -51,6 +51,7 @@ export class GaragesService {
 
   update(updateGarageInput: UpdateGarageInput) {
     const { id, Address, Slots, ...data } = updateGarageInput
+    console.log(Address, Slots)
     return this.prisma.garage.update({
       where: { id },
       data: data,
