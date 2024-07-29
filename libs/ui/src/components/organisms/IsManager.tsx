@@ -1,11 +1,17 @@
 import { MyCompanyDocument } from '@ufopark/network/src/gql/generated'
-import { BaseComponent } from '@ufopark/util/types'
 import { useQuery } from '@apollo/client'
 import { LoaderPanel } from '../molecules/Loader'
 import { AlertSection } from '../molecules/AlertSection'
 import { CreateCompany } from './CreateCompany'
+import { ReactNode } from 'react'
 
-export const IsManager = ({ children }: BaseComponent) => {
+type RenderPropChild = (id: number) => ReactNode
+
+export const IsManager = ({
+  children,
+}: {
+  children: RenderPropChild | ReactNode
+}) => {
   const { data, loading } = useQuery(MyCompanyDocument)
 
   if (loading) {
@@ -20,5 +26,11 @@ export const IsManager = ({ children }: BaseComponent) => {
       </AlertSection>
     )
 
-  return children
+  return (
+    <>
+      {typeof children === 'function'
+        ? (children as RenderPropChild)(data.myCompany.id)
+        : children}
+    </>
+  )
 }
