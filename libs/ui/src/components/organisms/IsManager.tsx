@@ -3,6 +3,7 @@ import { BaseComponent } from '@ufopark/util/types'
 import { useQuery } from '@apollo/client'
 import { LoaderPanel } from '../molecules/Loader'
 import { AlertSection } from '../molecules/AlertSection'
+import { CreateCompany } from './CreateCompany'
 
 export const IsManager = ({ children }: BaseComponent) => {
   const { data, loading } = useQuery(MyCompanyDocument)
@@ -15,7 +16,7 @@ export const IsManager = ({ children }: BaseComponent) => {
     return (
       <AlertSection>
         <div>You don&apos;t have a company yet.</div>
-        {/* Todo Create company */}
+        <CreateCompany />
       </AlertSection>
     )
 

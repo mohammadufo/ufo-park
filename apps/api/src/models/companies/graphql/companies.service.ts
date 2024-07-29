@@ -7,6 +7,7 @@ import { UpdateCompanyInput } from './dtos/update-company.input'
 @Injectable()
 export class CompaniesService {
   constructor(private readonly prisma: PrismaService) {}
+
   async create({
     description,
     displayName,
