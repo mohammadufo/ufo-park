@@ -1,7 +1,12 @@
-import React from 'react'
+import { ListCustomerBookings } from '@ufopark/ui/src/components/templates/ListCustomerBookings'
+import { IsLoggedIn } from '@ufopark/ui/src/components/organisms/IsLoggedIn'
 
 function page() {
-  return <div>Booking</div>
+  return (
+    <IsLoggedIn>
+      <ListCustomerBookings />
+    </IsLoggedIn>
+  )
 }
 
 export default page
