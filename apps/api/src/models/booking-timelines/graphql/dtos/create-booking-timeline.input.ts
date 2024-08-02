@@ -1,9 +1,9 @@
-import { InputType, OmitType } from '@nestjs/graphql'
+import { InputType, PickType } from '@nestjs/graphql'
 import { BookingTimeline } from '../entity/booking-timeline.entity'
 
 @InputType()
-export class CreateBookingTimelineInput extends OmitType(
+export class CreateBookingTimelineInput extends PickType(
   BookingTimeline,
-  ['id'],
+  ['bookingId', 'status'],
   InputType,
 ) {}

@@ -321,7 +321,6 @@ input BookingListRelationFilter {
 }
 
 input BookingWhereInput {
-  status: BookingStatus
   id: IntFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
@@ -332,6 +331,7 @@ input BookingWhereInput {
   vehicleNumber: StringFilter
   phoneNumber: StringFilter
   passcode: StringFilter
+  status: EnumBookingStatusFilter
   slotId: IntFilter
   customerId: StringFilter
   ValetAssignment: ValetAssignmentRelationFilter
@@ -341,6 +341,13 @@ input BookingWhereInput {
   AND: [BookingWhereInput!]
   OR: [BookingWhereInput!]
   NOT: [BookingWhereInput!]
+}
+
+input EnumBookingStatusFilter {
+  equals: BookingStatus
+  in: [BookingStatus!]
+  notIn: [BookingStatus!]
+  not: BookingStatus
 }
 
 input ValetAssignmentRelationFilter {
@@ -643,6 +650,8 @@ type Query {
   slots(distinct: [SlotScalarFieldEnum!], where: SlotWhereInput, orderBy: [SlotOrderByWithRelationInput!], cursor: SlotWhereUniqueInput, take: Float, skip: Float): [Slot!]!
   slot(where: SlotWhereUniqueInput!): Slot!
   bookings(distinct: [BookingScalarFieldEnum!], where: BookingWhereInput, orderBy: [BookingOrderByWithRelationInput!], cursor: BookingWhereUniqueInput, take: Float, skip: Float): [Booking!]!
+  bookingsForGarage(distinct: [BookingScalarFieldEnum!], where: BookingWhereInput, orderBy: [BookingOrderByWithRelationInput!], cursor: BookingWhereUniqueInput, take: Float, skip: Float, garageId: Float!): [Booking!]!
+  bookingsCount(where: BookingWhereInput): AggregateCountOutput!
   booking(where: BookingWhereUniqueInput!): Booking!
   valetAssignments(distinct: [ValetAssignmentScalarFieldEnum!], where: ValetAssignmentWhereInput, orderBy: [ValetAssignmentOrderByWithRelationInput!], cursor: ValetAssignmentWhereUniqueInput, take: Float, skip: Float): [ValetAssignment!]!
   valetAssignment(where: ValetAssignmentWhereUniqueInput!): ValetAssignment!
@@ -1311,17 +1320,11 @@ input UpdateValetAssignmentInput {
 
 input CreateBookingTimelineInput {
   status: BookingStatus!
-  valetId: String
-  managerId: String
-  timestamp: DateTime!
   bookingId: Float!
 }
 
 input UpdateBookingTimelineInput {
   status: BookingStatus
-  valetId: String
-  managerId: String
-  timestamp: DateTime
   bookingId: Float
   id: Float!
 }
