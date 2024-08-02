@@ -6,6 +6,7 @@ import { Header } from '@ufopark/ui/src/components/organisms/Header'
 import { MenuItem } from '@ufopark/util/types'
 import { ToastContainer } from '@ufopark/ui/src/components/molecules/Toast'
 import { Metadata } from 'next'
+import { Container } from '@ufopark/ui/src/components/atoms/Container'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,7 +32,7 @@ export default function RootLayout({
         <ApolloProvider>
           <body className={`${inter.className} bg-gray-25`}>
             <Header menuItems={MENUITEMS} />
-            {children}
+            <Container>{children}</Container>
             <ToastContainer />
           </body>
         </ApolloProvider>

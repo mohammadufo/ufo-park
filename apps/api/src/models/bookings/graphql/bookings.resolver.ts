@@ -1,9 +1,9 @@
 import {
   Resolver,
+  ResolveField,
   Query,
   Mutation,
   Args,
-  ResolveField,
   Parent,
 } from '@nestjs/graphql'
 import { BookingsService } from './bookings.service'
@@ -21,6 +21,7 @@ import { ValetAssignment } from 'src/models/valet-assignments/graphql/entity/val
 import { AggregateCountOutput } from 'src/common/dtos/common.input'
 import { BookingWhereInput } from './dtos/where.args'
 import { BookingTimeline } from 'src/models/booking-timelines/graphql/entity/booking-timeline.entity'
+import { BadRequestException } from '@nestjs/common'
 
 @Resolver(() => Booking)
 export class BookingsResolver {
@@ -62,9 +63,12 @@ export class BookingsResolver {
   async bookingsForGarage(
     @Args()
     { cursor, distinct, orderBy, skip, take, where }: FindManyBookingArgs,
-    @Args('garageId') garageId: number,
     @GetUser() user: GetUserType,
   ) {
+    const garageId = where.Slot.is.garageId.equals
+    if (!garageId) {
+      throw new BadRequestException('Pass garage id in where.Slot.is.garageId')
+    }
     const garage = await this.prisma.garage.findUnique({
       where: { id: garageId },
       include: { Company: { include: { Managers: true } } },
@@ -85,13 +89,6 @@ export class BookingsResolver {
         ...where,
         Slot: { is: { garageId: { equals: garageId } } },
       },
-    })
-  }
-
-  @ResolveField(() => [BookingTimeline])
-  bookingTimeline(@Parent() booking: Booking) {
-    return this.prisma.bookingTimeline.findMany({
-      where: { bookingId: booking.id },
     })
   }
 
@@ -145,6 +142,13 @@ export class BookingsResolver {
   customer(@Parent() booking: Booking) {
     return this.prisma.customer.findFirst({
       where: { uid: booking.customerId },
+    })
+  }
+
+  @ResolveField(() => [BookingTimeline])
+  bookingTimeline(@Parent() booking: Booking) {
+    return this.prisma.bookingTimeline.findMany({
+      where: { bookingId: booking.id },
     })
   }
 

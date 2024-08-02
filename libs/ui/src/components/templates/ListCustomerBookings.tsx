@@ -3,12 +3,11 @@ import { Tab, Tabs, TabPanel } from '../molecules/Tabs'
 import { useState } from 'react'
 import { ShowCustomerBookings } from '../organisms/ShowCustomerBookings'
 import { BookingStatus } from '@ufopark/network/src/gql/generated'
-import { Container } from '../atoms/Container'
 
 export const ListCustomerBookings = () => {
   const [value, setValue] = useState<0 | 1>(1)
   return (
-    <Container>
+    <>
       <Tabs
         value={value}
         onChange={(e, v) => setValue(v)}
@@ -31,6 +30,6 @@ export const ListCustomerBookings = () => {
           ]}
         />
       </TabPanel>
-    </Container>
+    </>
   )
 }
