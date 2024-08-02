@@ -1,3 +1,5 @@
+'use client'
+
 import { useFormCreateCompany } from '@ufopark/forms/src/createCompany'
 import { Button } from '../atoms/Button'
 import { Dialog } from '../atoms/Dialog'

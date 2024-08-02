@@ -47,7 +47,7 @@ export class BookingTimelinesResolver {
       booking.Slot.Garage.Company.Managers.map((manager) => manager.uid),
     )
 
-    const [_, bookingTimeline] = await this.prisma.$transaction([
+    const [, bookingTimeline] = await this.prisma.$transaction([
       this.prisma.booking.update({
         data: { status: status },
         where: { id: bookingId },

@@ -1,3 +1,5 @@
+'use client'
+
 import { MyCompanyDocument } from '@ufopark/network/src/gql/generated'
 import { useQuery } from '@apollo/client'
 import { LoaderPanel } from '../molecules/Loader'
