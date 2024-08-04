@@ -595,13 +595,13 @@ type MinimalSlotGroupBy {
 type ValetAssignment {
   returnLat: Float
   returnLng: Float
+  pickupValetId: String
+  returnValetId: String
   bookingId: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
   pickupLat: Float!
   pickupLng: Float!
-  pickupValetId: String!
-  returnValetId: String!
   pickupValet: Valet
   returnValet: Valet
 }
@@ -641,7 +641,11 @@ type Query {
   companyValets(distinct: [ValetScalarFieldEnum!], where: ValetWhereInput, orderBy: [ValetOrderByWithRelationInput!], cursor: ValetWhereUniqueInput, take: Float, skip: Float): [Valet!]!
   companyValetsTotal(where: ValetWhereInput): Float!
   valet(where: ValetWhereUniqueInput!): Valet!
-  valetMe: Valet!
+  valetMe: Valet
+  valetPickups(take: Float, skip: Float): [Booking!]!
+  valetPickupsTotal: Float!
+  valetDrops(take: Float, skip: Float): [Booking!]!
+  valetDropsTotal: Float!
   companies(distinct: [CompanyScalarFieldEnum!], where: CompanyWhereInput, orderBy: [CompanyOrderByWithRelationInput!], cursor: CompanyWhereUniqueInput, take: Float, skip: Float): [Company!]!
   myCompany: Company!
   company(where: CompanyWhereUniqueInput!): Company!
@@ -1306,21 +1310,21 @@ input UpdateBookingInput {
 input CreateValetAssignmentInput {
   returnLat: Float
   returnLng: Float
+  pickupValetId: String
+  returnValetId: String
   bookingId: Float!
   pickupLat: Float!
   pickupLng: Float!
-  pickupValetId: String!
-  returnValetId: String!
 }
 
 input UpdateValetAssignmentInput {
   returnLat: Float
   returnLng: Float
+  pickupValetId: String
+  returnValetId: String
   bookingId: Float!
   pickupLat: Float
   pickupLng: Float
-  pickupValetId: String
-  returnValetId: String
 }
 
 input CreateBookingTimelineInput {

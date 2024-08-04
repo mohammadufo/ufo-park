@@ -9,6 +9,8 @@ import { GetUserType } from 'src/common/types'
 import { AllowAuthenticated, GetUser } from 'src/common/auth/auth.decorator'
 import { PrismaService } from 'src/common/prisma/prisma.service'
 import { ValetWhereInput } from './dtos/where.args'
+import { Booking } from 'src/models/bookings/graphql/entity/booking.entity'
+import { PaginationInput } from 'src/common/dtos/common.input'
 
 @Resolver(() => Valet)
 export class ValetsResolver {
@@ -71,9 +73,81 @@ export class ValetsResolver {
   }
 
   @AllowAuthenticated()
-  @Query(() => Valet, { name: 'valetMe' })
+  @Query(() => Valet, { name: 'valetMe', nullable: true })
   valetMe(@GetUser() user: GetUserType) {
     return this.valetsService.findOne({ where: { uid: user.uid } })
+  }
+
+  @AllowAuthenticated('valet')
+  @Query(() => [Booking], { name: 'valetPickups' })
+  async valetPickups(
+    @Args() { skip, take }: PaginationInput,
+    @GetUser() user: GetUserType,
+  ) {
+    const valet = await this.valetsService.validValet(user.uid)
+    return this.prisma.booking.findMany({
+      skip,
+      take,
+      where: {
+        Slot: { Garage: { companyId: valet.companyId } },
+        ValetAssignment: {
+          pickupLat: { not: undefined },
+          pickupValetId: null,
+        },
+      },
+    })
+  }
+
+  @AllowAuthenticated()
+  @Query(() => Number)
+  async valetPickupsTotal(@GetUser() user: GetUserType) {
+    const valet = await this.valetsService.validValet(user.uid)
+    return this.prisma.booking.count({
+      where: {
+        Slot: { Garage: { companyId: valet.companyId } },
+        ValetAssignment: {
+          pickupLat: { not: undefined },
+          pickupValetId: null,
+        },
+      },
+    })
+  }
+
+  @AllowAuthenticated()
+  @Query(() => [Booking], { name: 'valetDrops' })
+  async valetDrops(
+    @Args() { skip, take }: PaginationInput,
+    @GetUser() user: GetUserType,
+  ) {
+    const valet = await this.valetsService.validValet(user.uid)
+
+    return this.prisma.booking.findMany({
+      skip,
+      take,
+      where: {
+        Slot: { Garage: { companyId: valet.companyId } },
+        ValetAssignment: {
+          returnLat: { not: null },
+          returnValetId: null,
+        },
+      },
+    })
+  }
+
+  @AllowAuthenticated()
+  @Query(() => Number)
+  async valetDropsTotal(@GetUser() user: GetUserType) {
+    const valet = await this.valetsService.validValet(user.uid)
+
+    return this.prisma.booking.count({
+      where: {
+        Slot: { Garage: { companyId: valet.companyId } },
+        ValetAssignment: {
+          returnLat: { not: null },
+          returnValetId: null,
+        },
+      },
+    })
   }
 
   @AllowAuthenticated()
