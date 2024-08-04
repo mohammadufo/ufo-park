@@ -12,6 +12,7 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@headlessui/react": "^2.1.2",
+    "@mapbox/polyline": "^1.2.1",
     "@mui/material": "^5.16.5",
     "@stripe/stripe-js": "^4.1.0",
     "@ufopark/forms": "*",
@@ -24,6 +25,7 @@
     "react-toastify": "^10.0.5"
   },
   "devDependencies": {
+    "@types/mapbox__polyline": "^1.0.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -15,6 +15,9 @@ export class ValetAssignment
   returnLat: number
   @Field({ nullable: true })
   returnLng: number
+
+  @Field({ nullable: true })
   pickupValetId: string
+  @Field({ nullable: true })
   returnValetId: string
 }

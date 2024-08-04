@@ -1030,7 +1030,11 @@ export type Query = {
   valet: Valet
   valetAssignment: ValetAssignment
   valetAssignments: Array<ValetAssignment>
-  valetMe: Valet
+  valetDrops: Array<Booking>
+  valetDropsTotal: Scalars['Float']['output']
+  valetMe?: Maybe<Valet>
+  valetPickups: Array<Booking>
+  valetPickupsTotal: Scalars['Float']['output']
   valets: Array<Valet>
   verification: Verification
   verifications: Array<Verification>
@@ -1245,6 +1249,16 @@ export type QueryValetAssignmentsArgs = {
   skip?: InputMaybe<Scalars['Float']['input']>
   take?: InputMaybe<Scalars['Float']['input']>
   where?: InputMaybe<ValetAssignmentWhereInput>
+}
+
+export type QueryValetDropsArgs = {
+  skip?: InputMaybe<Scalars['Float']['input']>
+  take?: InputMaybe<Scalars['Float']['input']>
+}
+
+export type QueryValetPickupsArgs = {
+  skip?: InputMaybe<Scalars['Float']['input']>
+  take?: InputMaybe<Scalars['Float']['input']>
 }
 
 export type QueryValetsArgs = {
@@ -2238,7 +2252,11 @@ export type ValetMeQueryVariables = Exact<{ [key: string]: never }>
 
 export type ValetMeQuery = {
   __typename?: 'Query'
-  valetMe: { __typename?: 'Valet'; uid: string; companyId?: number | null }
+  valetMe?: {
+    __typename?: 'Valet'
+    uid: string
+    companyId?: number | null
+  } | null
 }
 
 export type CreateValetMutationVariables = Exact<{
@@ -2276,6 +2294,66 @@ export type CompanyValetsQuery = {
   }>
 }
 
+export type ValetPickupsQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Float']['input']>
+  take?: InputMaybe<Scalars['Float']['input']>
+}>
+
+export type ValetPickupsQuery = {
+  __typename?: 'Query'
+  valetPickupsTotal: number
+  valetPickups: Array<{
+    __typename?: 'Booking'
+    id: number
+    vehicleNumber: string
+    startTime: any
+    endTime: any
+    valetAssignment?: {
+      __typename?: 'ValetAssignment'
+      pickupLat: number
+      pickupLng: number
+      pickupValetId: string
+    } | null
+    slot: {
+      __typename?: 'Slot'
+      garage: {
+        __typename?: 'Garage'
+        address?: { __typename?: 'Address'; lat: number; lng: number } | null
+      }
+    }
+  }>
+}
+
+export type ValetDropsQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Float']['input']>
+  take?: InputMaybe<Scalars['Float']['input']>
+}>
+
+export type ValetDropsQuery = {
+  __typename?: 'Query'
+  valetDropsTotal: number
+  valetDrops: Array<{
+    __typename?: 'Booking'
+    id: number
+    vehicleNumber: string
+    startTime: any
+    endTime: any
+    valetAssignment?: {
+      __typename?: 'ValetAssignment'
+      returnLat?: number | null
+      returnLng?: number | null
+      returnValetId: string
+    } | null
+    slot: {
+      __typename?: 'Slot'
+      garage: {
+        __typename?: 'Garage'
+        address?: { __typename?: 'Address'; lat: number; lng: number } | null
+      }
+    }
+  }>
+}
+
 export const namedOperations = {
   Query: {
     Companies: 'Companies',
@@ -2287,6 +2365,8 @@ export const namedOperations = {
     BookingsForGarage: 'BookingsForGarage',
     ValetMe: 'ValetMe',
     companyValets: 'companyValets',
+    valetPickups: 'valetPickups',
+    valetDrops: 'valetDrops',
   },
   Mutation: {
     RegisterWithCredentials: 'RegisterWithCredentials',
@@ -4352,3 +4432,239 @@ export const CompanyValetsDocument = {
     },
   ],
 } as unknown as DocumentNode<CompanyValetsQuery, CompanyValetsQueryVariables>
+export const ValetPickupsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'valetPickups' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'valetPickups' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'vehicleNumber' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'valetAssignment' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'pickupLat' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'pickupLng' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'pickupValetId' },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'startTime' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'endTime' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'slot' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'garage' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'address' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'lat' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'lng' },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'valetPickupsTotal' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ValetPickupsQuery, ValetPickupsQueryVariables>
+export const ValetDropsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'valetDrops' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'valetDrops' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'vehicleNumber' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'startTime' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'endTime' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'valetAssignment' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'returnLat' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'returnLng' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'returnValetId' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'slot' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'garage' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'address' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'lat' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'lng' },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'valetDropsTotal' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ValetDropsQuery, ValetDropsQueryVariables>
