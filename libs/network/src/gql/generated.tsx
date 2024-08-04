@@ -464,10 +464,10 @@ export type CreateValetAssignmentInput = {
   bookingId: Scalars['Float']['input']
   pickupLat: Scalars['Float']['input']
   pickupLng: Scalars['Float']['input']
-  pickupValetId: Scalars['String']['input']
+  pickupValetId?: InputMaybe<Scalars['String']['input']>
   returnLat?: InputMaybe<Scalars['Float']['input']>
   returnLng?: InputMaybe<Scalars['Float']['input']>
-  returnValetId: Scalars['String']['input']
+  returnValetId?: InputMaybe<Scalars['String']['input']>
 }
 
 export type CreateValetAssignmentInputWithoutBookingId = {
@@ -766,6 +766,7 @@ export type MinimalSlotGroupBy = {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  assignValet: Booking
   createAddress: Address
   createAdmin: Admin
   createBooking: Booking
@@ -811,6 +812,11 @@ export type Mutation = {
   updateValet: Valet
   updateValetAssignment: ValetAssignment
   updateVerification: Verification
+}
+
+export type MutationAssignValetArgs = {
+  bookingId: Scalars['Float']['input']
+  status: Scalars['String']['input']
 }
 
 export type MutationCreateAddressArgs = {
@@ -1668,11 +1674,11 @@ export type ValetAssignment = {
   pickupLat: Scalars['Float']['output']
   pickupLng: Scalars['Float']['output']
   pickupValet?: Maybe<Valet>
-  pickupValetId: Scalars['String']['output']
+  pickupValetId?: Maybe<Scalars['String']['output']>
   returnLat?: Maybe<Scalars['Float']['output']>
   returnLng?: Maybe<Scalars['Float']['output']>
   returnValet?: Maybe<Valet>
-  returnValetId: Scalars['String']['output']
+  returnValetId?: Maybe<Scalars['String']['output']>
   updatedAt: Scalars['DateTime']['output']
 }
 
@@ -2312,7 +2318,7 @@ export type ValetPickupsQuery = {
       __typename?: 'ValetAssignment'
       pickupLat: number
       pickupLng: number
-      pickupValetId: string
+      pickupValetId?: string | null
     } | null
     slot: {
       __typename?: 'Slot'
@@ -2342,7 +2348,7 @@ export type ValetDropsQuery = {
       __typename?: 'ValetAssignment'
       returnLat?: number | null
       returnLng?: number | null
-      returnValetId: string
+      returnValetId?: string | null
     } | null
     slot: {
       __typename?: 'Slot'
@@ -2352,6 +2358,16 @@ export type ValetDropsQuery = {
       }
     }
   }>
+}
+
+export type AssignValetMutationVariables = Exact<{
+  bookingId: Scalars['Float']['input']
+  status: Scalars['String']['input']
+}>
+
+export type AssignValetMutation = {
+  __typename?: 'Mutation'
+  assignValet: { __typename?: 'Booking'; id: number }
 }
 
 export const namedOperations = {
@@ -2377,6 +2393,7 @@ export const namedOperations = {
     CreateManySlots: 'CreateManySlots',
     createBookingTimeline: 'createBookingTimeline',
     CreateValet: 'CreateValet',
+    AssignValet: 'AssignValet',
   },
   Fragment: {
     ValetFields: 'ValetFields',
@@ -4668,3 +4685,73 @@ export const ValetDropsDocument = {
     },
   ],
 } as unknown as DocumentNode<ValetDropsQuery, ValetDropsQueryVariables>
+export const AssignValetDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'AssignValet' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'bookingId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'status' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'assignValet' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'bookingId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'bookingId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'status' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'status' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AssignValetMutation, AssignValetMutationVariables>

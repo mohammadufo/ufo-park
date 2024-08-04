@@ -60,7 +60,7 @@ export class ValetsResolver {
       ...booking.Slot.Garage.Company.Valets.map((valet) => valet.uid),
     ])
 
-    const [updatedBooking, bookingTimeline] = await this.prisma.$transaction([
+    const [updatedBooking] = await this.prisma.$transaction([
       this.prisma.booking.update({
         where: { id: bookingId },
         data: {

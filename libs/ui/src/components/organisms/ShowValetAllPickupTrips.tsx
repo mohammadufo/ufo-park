@@ -6,7 +6,7 @@ import { useQuery } from '@apollo/client'
 import { useTakeSkip } from '@ufopark/util/hooks/pagination'
 import { ShowData } from './ShowData'
 import { ValetTripCard } from './ValetTripCard'
-// import { AssignValetButton } from './AssignValetButton'
+import { AssignValetButton } from './AssignValetButton'
 
 export const ShowValetAllPickupTrips = () => {
   const { loading, data } = useQuery(ValetPickupsDocument)
@@ -36,12 +36,12 @@ export const ShowValetAllPickupTrips = () => {
           }}
           end={booking.slot.garage.address}
         >
-          {/* <AssignValetButton
+          <AssignValetButton
             bookingId={booking.id}
             status={BookingStatus.ValetAssignedForCheckIn}
           >
             Accept
-          </AssignValetButton> */}
+          </AssignValetButton>
         </ValetTripCard>
       ))}
     </ShowData>
