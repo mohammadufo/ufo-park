@@ -11,6 +11,7 @@ import { PrismaService } from 'src/common/prisma/prisma.service'
 import { ValetWhereInput } from './dtos/where.args'
 import { Booking } from 'src/models/bookings/graphql/entity/booking.entity'
 import { PaginationInput } from 'src/common/dtos/common.input'
+import { BookingStatus } from '@prisma/client'
 
 @Resolver(() => Valet)
 export class ValetsResolver {
@@ -30,6 +31,62 @@ export class ValetsResolver {
     })
 
     return this.valetsService.create({ ...args, companyId: company.id })
+  }
+
+  @AllowAuthenticated()
+  @Mutation(() => Booking)
+  async assignValet(
+    @Args('bookingId') bookingId: number,
+    @Args('status') status: BookingStatus,
+    @GetUser() user: GetUserType,
+  ) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        Slot: {
+          select: {
+            Garage: {
+              select: {
+                Company: { select: { Managers: true, Valets: true } },
+              },
+            },
+          },
+        },
+      },
+    })
+
+    checkRowLevelPermission(user, [
+      ...booking.Slot.Garage.Company.Managers.map((manager) => manager.uid),
+      ...booking.Slot.Garage.Company.Valets.map((valet) => valet.uid),
+    ])
+
+    const [updatedBooking, bookingTimeline] = await this.prisma.$transaction([
+      this.prisma.booking.update({
+        where: { id: bookingId },
+        data: {
+          status,
+          ...(status === BookingStatus.VALET_ASSIGNED_FOR_CHECK_IN && {
+            ValetAssignment: {
+              update: { pickupValetId: user.uid },
+            },
+          }),
+          ...(status === BookingStatus.VALET_ASSIGNED_FOR_CHECK_OUT && {
+            ValetAssignment: {
+              update: { returnValetId: user.uid },
+            },
+          }),
+        },
+      }),
+      this.prisma.bookingTimeline.create({
+        data: {
+          bookingId,
+          valetId: user.uid,
+          status,
+        },
+      }),
+    ])
+
+    return updatedBooking
   }
 
   @Query(() => [Valet], { name: 'valets' })
