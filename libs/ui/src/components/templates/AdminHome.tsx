@@ -4,6 +4,8 @@ import { useQuery } from '@apollo/client'
 import { GaragesDocument } from '@ufopark/network/src/gql/generated'
 import { ShowData } from '../organisms/ShowData'
 import { GarageAdminCard } from '../organisms/GarageAdminCard'
+import { CreateVerificationButton } from '../organisms/admin/CreateVerificationButton'
+import { RemoveVerificationButton } from '../organisms/admin/RemoveVerificationButton'
 
 export const AdminHome = () => {
   return <ShowGarages />
@@ -31,7 +33,13 @@ export const ShowGarages = () => {
     >
       {data?.garages.map((garage) => (
         <GarageAdminCard key={garage.id} garage={garage}>
-          <div className="flex justify-end"></div>
+          <div className="flex justify-end">
+            {!garage?.verification?.verified ? (
+              <CreateVerificationButton garageId={garage.id} />
+            ) : (
+              <RemoveVerificationButton garageId={garage.id} />
+            )}
+          </div>
         </GarageAdminCard>
       ))}
     </ShowData>

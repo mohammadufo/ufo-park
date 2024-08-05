@@ -31,6 +31,7 @@ export const GarageAdminCard = ({
         {garage.address ? (
           <MapLink
             waypoints={[garage.address]}
+            //@ts-ignore
             className="hover:underline underline-offset-4"
           >
             <p className="text-xs text-gray-700 ">{garage.address?.address}</p>
