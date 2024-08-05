@@ -435,3 +435,9 @@ query myDropTrips(
     count
   }
 }
+
+query AdminMe {
+  adminMe {
+    uid
+  }
+}
