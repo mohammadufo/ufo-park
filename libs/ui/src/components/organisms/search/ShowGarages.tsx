@@ -3,15 +3,15 @@ import { SearchGaragesDocument } from '@ufopark/network/src/gql/generated'
 import { useEffect } from 'react'
 import { GarageMarker } from './GarageMarker'
 import { useConvertSearchFormToVariables } from '@ufopark/forms/src/adapters/searchFormAdapter'
-import { useFormContext } from 'react-hook-form'
 import { Panel } from '../map/Panel'
 import { Loader } from '../../molecules/Loader'
 import { IconInfoCircle } from '@tabler/icons-react'
 
 export const ShowGarages = () => {
-  const [searchGarages, { loading, data }] = useLazyQuery(SearchGaragesDocument)
+  const { variables, debouncing } = useConvertSearchFormToVariables()
 
-  const { variables } = useConvertSearchFormToVariables()
+  const [searchGarages, { loading: garagesLoading, data, previousData }] =
+    useLazyQuery(SearchGaragesDocument)
 
   useEffect(() => {
     if (variables) {
@@ -19,7 +19,10 @@ export const ShowGarages = () => {
     }
   }, [variables])
 
-  if (data?.searchGarages.length === 0) {
+  const garages = data?.searchGarages || previousData?.searchGarages || []
+  const loading = debouncing || garagesLoading
+
+  if (!loading && garages.length === 0) {
     return (
       <Panel
         position="center-center"
@@ -39,7 +42,7 @@ export const ShowGarages = () => {
           <Loader />
         </Panel>
       ) : null}
-      {data?.searchGarages.map((garage) => (
+      {garages.map((garage) => (
         <GarageMarker key={garage.id} marker={garage} />
       ))}
     </>
