@@ -7,6 +7,7 @@ import { Button } from '../atoms/Button'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export interface ILoginFormProps {
   className?: string
@@ -19,19 +20,20 @@ export const LoginForm = ({ className }: ILoginFormProps) => {
   } = useFormLogin()
 
   const { replace } = useRouter()
-
-  console.log('errors', errors)
+  const [loading, setLoading] = useState(false)
 
   return (
     <Form
       onSubmit={handleSubmit(async (data) => {
-        console.log('data', data)
         const { email, password } = data
+        setLoading(true)
+
         const result = await signIn('credentials', {
           email,
           password,
           redirect: false,
         })
+        setLoading(false)
 
         if (result?.ok) {
           replace('/')
@@ -51,16 +53,18 @@ export const LoginForm = ({ className }: ILoginFormProps) => {
           placeholder="******"
         />
       </HtmlLabel>
-      <Button type="submit">Sumbit</Button>
+      <Button type="submit" loading={loading}>
+        Submit
+      </Button>
       <div className="mt-4 text-sm">
-        Do not have an UFO Park account?
+        Do not have an UFOPark account?
         <br />
         <Link
           href="/register"
           className="font-bold underline underline-offset-4"
         >
           Create one
-        </Link>
+        </Link>{' '}
         now.
       </div>
     </Form>

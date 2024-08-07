@@ -75,15 +75,15 @@ export const RegisterForm = ({ className, role }: ISignupFormProps) => {
           Please fix the above {Object.keys(errors).length} errors
         </div>
       ) : null}
-      <Button type="submit" fullWidth>
+      <Button type="submit" fullWidth loading={loading}>
         Register
       </Button>
       <div className="mt-4 text-sm ">
-        Already have an autospace account?
+        Already have an UFOPark account?
         <br />
         <Link href="/login" className="font-bold underline underline-offset-4">
           Login
-        </Link>{' '}
+        </Link>
         now.
       </div>
     </Form>
