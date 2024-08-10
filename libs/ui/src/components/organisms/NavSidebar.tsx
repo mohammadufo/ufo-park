@@ -1,12 +1,12 @@
 'use client'
 import { IconMenu2 } from '@tabler/icons-react'
-import Link from 'next/link'
 import { Sidebar } from './Sidebar'
 import { useDialogState } from '@ufopark/util/hooks/dialog'
 
 import { MenuItem } from '@ufopark/util/types'
 import { LogoutButton } from '../molecules/LogoutButton'
 import { UserInfo } from '../molecules/UserInfo'
+import { Menus } from './Menus'
 
 export interface INavSidebarProps {
   menuItems: MenuItem[]
@@ -28,15 +28,7 @@ export const NavSidebar = ({ menuItems }: INavSidebarProps) => {
       <Sidebar open={open} setOpen={setOpen}>
         <div className="flex flex-col items-start space-y-1">
           <UserInfo className="mb-4" />
-          {menuItems.map(({ label, href }) => (
-            <Link
-              className="hover:underline underline-offset-8 transition-all hover:pl-1"
-              key={label}
-              href={href}
-            >
-              {label}
-            </Link>
-          ))}
+          <Menus menuItems={menuItems} />
         </div>
         <div className=" mt-auto">
           <LogoutButton />

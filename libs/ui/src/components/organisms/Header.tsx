@@ -4,12 +4,10 @@ import { Brand } from '../atoms/Brand'
 import { Container } from '../atoms/Container'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Sidebar } from './Sidebar'
-import { UserInfo } from '../molecules/UserInfo'
-import { LogoutButton } from '../molecules/LogoutButton'
 import { Button } from '../atoms/Button'
 import { useDialogState } from '@ufopark/util/hooks/dialog'
 import { NavSidebar } from './NavSidebar'
+import { Menus } from './Menus'
 
 export type IHeaderProps = {
   type?: Role
@@ -31,7 +29,13 @@ export const Header = ({ type, menuItems }: IHeaderProps) => {
           </Link>
           <div className="flex items-center gap-2">
             {uid ? (
-              <NavSidebar menuItems={menuItems} />
+              <div className="flex gap-6 items-center">
+                <div className="text-sm mr-6 flex gap-3">
+                  <Menus menuItems={menuItems} />
+                </div>
+
+                <NavSidebar menuItems={menuItems} />
+              </div>
             ) : (
               <>
                 <Link href="/register">
