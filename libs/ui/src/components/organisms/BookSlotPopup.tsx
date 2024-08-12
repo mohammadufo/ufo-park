@@ -24,6 +24,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { TotalPrice } from '@ufopark/util/types'
 import { ManageValets } from './ManageValets'
+import { toast } from '../molecules/Toast'
 
 export const BookSlotPopup = ({
   garage,
@@ -63,7 +64,7 @@ export const BookSlotPopup = ({
       <Form
         onSubmit={handleSubmit(async (data) => {
           if (!uid) {
-            alert('You are not logged in.')
+            toast('You are not logged in.')
             return
           }
           const bookingData: CreateBookingInput = {
