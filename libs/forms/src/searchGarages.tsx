@@ -1,46 +1,45 @@
+import { SlotType } from '@ufopark/network/src/gql/generated'
 import { z } from 'zod'
 import { toLocalISOString } from '@ufopark/util/date'
 import { ReactNode } from 'react'
 import { DefaultValues, useForm, FormProvider, Form } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SlotType } from '@ufopark/network/src/gql/generated'
 import { isEndTimeValid, isStartTimeValid } from './util'
 
 const minMaxTuple = z.tuple([z.number(), z.number()])
 
-export const formSchemaSearchGarage = z.object({
-  startTime: z.string(),
-  endTime: z.string(),
+export const formSchemaSearchGarage = z
+  .object({
+    startTime: z.string(),
+    endTime: z.string(),
 
-  locationFilter: z.object({
-    ne_lat: z.number(),
-    ne_lng: z.number(),
-    sw_lat: z.number(),
-    sw_lng: z.number(),
-  }),
+    locationFilter: z.object({
+      ne_lat: z.number(),
+      ne_lng: z.number(),
+      sw_lat: z.number(),
+      sw_lng: z.number(),
+    }),
 
-  types: z.nativeEnum(SlotType).array(),
+    types: z.nativeEnum(SlotType).array(),
 
-  pricePerHour: minMaxTuple.optional(),
-  height: minMaxTuple.optional(),
-  width: minMaxTuple.optional(),
-  length: minMaxTuple.optional(),
+    pricePerHour: minMaxTuple.optional(),
+    height: minMaxTuple.optional(),
+    width: minMaxTuple.optional(),
+    length: minMaxTuple.optional(),
 
-  skip: z.number().optional(),
-  take: z.number().optional(),
-})
-
-export type FormTypeSearchGarage = z.infer<typeof formSchemaSearchGarage>
-
-formSchemaSearchGarage
-  .refine(({ endTime, startTime }) => isStartTimeValid(startTime), {
+    skip: z.number().optional(),
+    take: z.number().optional(),
+  })
+  .refine(({ startTime }) => isStartTimeValid(startTime), {
     message: 'Start time should be greater than current time',
     path: ['startTime'],
   })
-  .refine(({ startTime, endTime }) => isEndTimeValid({ endTime, startTime }), {
+  .refine(({ endTime, startTime }) => isEndTimeValid({ endTime, startTime }), {
     message: 'End time should be greater than start time',
     path: ['endTime'],
   })
+
+export type FormTypeSearchGarage = z.infer<typeof formSchemaSearchGarage>
 
 export const getCurrentTimeAndOneHourLater = () => {
   const startTime = new Date()
