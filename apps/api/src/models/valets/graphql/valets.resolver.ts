@@ -12,6 +12,7 @@ import { ValetWhereInput } from './dtos/where.args'
 import { Booking } from 'src/models/bookings/graphql/entity/booking.entity'
 import { PaginationInput } from 'src/common/dtos/common.input'
 import { BookingStatus } from '@prisma/client'
+import { BadGatewayException } from '@nestjs/common'
 
 @Resolver(() => Valet)
 export class ValetsResolver {
@@ -29,6 +30,10 @@ export class ValetsResolver {
     const company = await this.prisma.company.findFirst({
       where: { Managers: { some: { uid: user.uid } } },
     })
+
+    if (!company) {
+      throw new BadGatewayException('You do not have a company.')
+    }
 
     return this.valetsService.create({ ...args, companyId: company.id })
   }
