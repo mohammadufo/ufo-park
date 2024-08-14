@@ -6,17 +6,13 @@ import {
   GetAuthProviderDocument,
   LoginDocument,
   RegisterWithProviderDocument,
-  //@ts-ignore
+  // @ts-ignore
 } from '@ufopark/network/src/gql/generated'
 import { fetchGraphQL } from '../fetch'
 import * as jwt from 'jsonwebtoken'
 import { JWT } from 'next-auth/jwt'
 
 const MAX_AGE = 1 * 24 * 60 * 60
-
-const secureCookies = process.env.NEXTAUTH_URL?.startsWith('https://')
-const hostName = new URL(process.env.NEXTAUTH_URL || '').hostname
-const rootDomain = ''
 
 export const authOptions: NextAuthOptions = {
   // Configure authentication providers
@@ -115,18 +111,6 @@ export const authOptions: NextAuthOptions = {
         return null
       }
       // ...
-    },
-  },
-  cookies: {
-    sessionToken: {
-      name: `${secureCookies ? '__Secure-' : ''}next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: secureCookies,
-        domain: hostName == 'localhost' ? hostName : '.' + rootDomain, // add a . in front so that subdomains are included
-      },
     },
   },
 
