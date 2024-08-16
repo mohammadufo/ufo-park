@@ -24,6 +24,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           scope: 'openid profile',
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
         },
       },
     }),
