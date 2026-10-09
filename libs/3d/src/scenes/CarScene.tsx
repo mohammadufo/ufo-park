@@ -1,138 +1,190 @@
+import { useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, Plane } from '@react-three/drei'
-import { radians } from '../util'
-import { Spawner } from '../components/Spawner'
 import {
+  OrbitControls,
+  PerformanceMonitor,
+  PerspectiveCamera,
+} from '@react-three/drei'
+import * as THREE from 'three'
+import { radians } from '../util'
+import {
+  BLOCK_INTERVAL,
   WORLD_DURATION,
   WORLD_END,
   WORLD_START,
-  roadColor,
+  fogColor,
+  yellowColor,
 } from '../util/constants'
-import * as THREE from 'three'
-import { Square } from '../components/Square'
+import {
+  useInView,
+  usePageVisible,
+  usePrefersReducedMotion,
+} from '../util/hooks'
+import { Spawner } from '../components/Spawner'
 import { Car } from '../components/Car'
-import { Building } from '../components/Building'
 import { BuildingSet } from '../components/BuildingSet'
+import { ParkingStrip } from '../components/ParkingStrip'
+import { Road } from '../components/Road'
+import { ScannerRing } from '../components/ScannerRing'
+
+export interface CarSceneProps {
+  camera?: React.ReactNode
+  children?: React.ReactNode
+  /** Classes for the wrapper; the canvas fills it. */
+  className?: string
+  orbitControls?: boolean
+  hideAllComments?: boolean
+  /** Curbside parking bays with highlighted free spots. */
+  showParking?: boolean
+  /** Called once the WebGL context is ready, e.g. to fade the scene in. */
+  onReady?: () => void
+}
+
+const v = (x: number, z: number) => new THREE.Vector3(x, 0, z)
+const BUILDINGS_Z = 76
+
+/** Lanes: negative z drives towards +x, positive z towards -x. */
+const TRAFFIC = [
+  { z: -10, interval: 8.2, duration: WORLD_DURATION - 6, searching: true },
+  { z: -6, interval: 4.3, duration: WORLD_DURATION - 12 },
+  { z: -2, interval: 7.4, duration: WORLD_DURATION - 18 },
+  { z: 2, interval: 9.8, duration: WORLD_DURATION - 18, forward: true },
+  { z: 6, interval: 7, duration: WORLD_DURATION - 12, forward: true },
+]
 
 export const CarScene = ({
   children,
   camera,
-  className = 'h-[calc(100vh-2rem)]',
+  className,
   orbitControls = true,
   hideAllComments = false,
-}: {
-  camera?: React.ReactNode
-  children?: React.ReactNode
-  className?: string
-  orbitControls?: boolean
-  hideAllComments?: boolean
-}) => {
+  showParking = true,
+  onReady,
+}: CarSceneProps) => {
+  const wrapper = useRef<HTMLDivElement>(null)
+  const inView = useInView(wrapper)
+  const pageVisible = usePageVisible()
+  const reducedMotion = usePrefersReducedMotion()
+  const [dpr, setDpr] = useState(1.5)
+
+  // Don't burn GPU when nobody can see the scene; render a still frame for
+  // people who asked their OS to reduce motion.
+  const frameloop = reducedMotion
+    ? 'demand'
+    : inView && pageVisible
+      ? 'always'
+      : 'never'
+
   return (
-    <Canvas
+    <div
+      ref={wrapper}
+      className={`relative h-full w-full overflow-hidden ${className ?? ''}`}
       style={{
         background:
-          'linear-gradient(to top right, hsl(0, 0%, 8%), hsl(52, 0%, 18%))',
+          'radial-gradient(120% 90% at 65% 40%, hsl(52, 4%, 12%), hsl(240, 4%, 5%))',
       }}
     >
-      {camera || (
-        <PerspectiveCamera
-          makeDefault
-          fov={45}
-          near={0.1}
-          far={1000}
-          position={[40, 200, 40]}
-          rotation={[radians(60), 0, 0]}
+      <Canvas
+        frameloop={frameloop}
+        dpr={[1, dpr]}
+        flat
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        }}
+        style={{ position: 'absolute', inset: 0 }}
+        fallback={null}
+        onCreated={() => onReady?.()}
+      >
+        <fog attach="fog" args={[fogColor, 170, 430]} />
+        <PerformanceMonitor
+          onDecline={() => setDpr(1)}
+          onIncline={() => setDpr(1.5)}
         />
-      )}
-      {children}
 
-      {orbitControls ? (
-        <OrbitControls
-          minPolarAngle={radians(0)}
-          maxPolarAngle={radians(30)}
-          //   minAzimuthAngle={radians(0)}
-          //   maxAzimuthAngle={radians(270)}
-          minDistance={30}
-          maxDistance={180}
-        />
-      ) : null}
+        {camera || (
+          <PerspectiveCamera
+            makeDefault
+            fov={45}
+            near={1}
+            far={1000}
+            position={[40, 200, 40]}
+            rotation={[radians(60), 0, 0]}
+          />
+        )}
+        {children}
 
-      {/* Road */}
+        {orbitControls ? (
+          <OrbitControls
+            minPolarAngle={radians(0)}
+            maxPolarAngle={radians(30)}
+            minDistance={30}
+            maxDistance={180}
+          />
+        ) : null}
 
-      <Plane
-        args={[1000, 24]}
-        position={[0, -0.2, 0]}
-        rotation={[radians(-90), 0, 0]}
-      >
-        <meshBasicMaterial color={roadColor} />
-      </Plane>
+        <Road animate={!reducedMotion} />
 
-      {/* Cars */}
+        {/* Curbside parking */}
+        {showParking
+          ? ([1, -1] as const).map((side) => (
+              <Spawner
+                key={side}
+                spawnInterval={BLOCK_INTERVAL}
+                duration={WORLD_DURATION}
+                offset={side === 1 ? 0.7 : 2.3}
+                startPosition={v(WORLD_START, 0)}
+                endPosition={v(WORLD_END, 0)}
+              >
+                <ParkingStrip side={side} />
+              </Spawner>
+            ))
+          : null}
 
-      <Spawner
-        spawnInterval={8.2}
-        duration={WORLD_DURATION - 6}
-        startPosition={new THREE.Vector3(WORLD_START, 0, -10)}
-        endPosition={new THREE.Vector3(WORLD_END, 0, -10)}
-      >
-        <Car forward={false} searching comment={!hideAllComments && true} />
-      </Spawner>
-      <Spawner
-        spawnInterval={4.3}
-        duration={WORLD_DURATION - 12}
-        startPosition={new THREE.Vector3(WORLD_START, 0, -6)}
-        endPosition={new THREE.Vector3(WORLD_END, 0, -6)}
-      >
-        <Car forward={false} />
-      </Spawner>
-      <Spawner
-        spawnInterval={7.4}
-        duration={WORLD_DURATION - 18}
-        startPosition={new THREE.Vector3(WORLD_START, 0, -2)}
-        endPosition={new THREE.Vector3(WORLD_END, 0, -2)}
-      >
-        <Car forward={false} />
-      </Spawner>
+        {/* Traffic */}
+        {TRAFFIC.map(({ z, interval, duration, forward, searching }) => (
+          <Spawner
+            key={z}
+            spawnInterval={interval}
+            duration={duration}
+            offset={interval * 0.37}
+            startPosition={forward ? v(WORLD_END, z) : v(WORLD_START, z)}
+            endPosition={forward ? v(WORLD_START, z) : v(WORLD_END, z)}
+          >
+            <Car
+              forward={!!forward}
+              searching={searching}
+              comment={searching && !hideAllComments}
+            />
+          </Spawner>
+        ))}
 
-      <Spawner
-        spawnInterval={9.8}
-        duration={WORLD_DURATION - 18}
-        endPosition={new THREE.Vector3(WORLD_START, 0, 2)}
-        startPosition={new THREE.Vector3(WORLD_END, 0, 2)}
-      >
-        <Car />
-      </Spawner>
-      <Spawner
-        spawnInterval={7}
-        duration={WORLD_DURATION - 12}
-        endPosition={new THREE.Vector3(WORLD_START, 0, 6)}
-        startPosition={new THREE.Vector3(WORLD_END, 0, 6)}
-      >
-        <Car />
-      </Spawner>
-      {/* My Car */}
-      <group position={new THREE.Vector3(0, 0, 10)}>
-        <Car searching comment={!hideAllComments && true} />
-      </group>
+        {/* My car: hunting for a spot along the curb */}
+        <group position={[0, 0, 10]}>
+          <Car
+            color={yellowColor}
+            size={[2.3, 0, 5.4]}
+            searching
+            comment={!hideAllComments}
+          />
+          <ScannerRing />
+        </group>
 
-      {/* Buildings Left */}
-      <Spawner
-        spawnInterval={3.6}
-        duration={WORLD_DURATION}
-        startPosition={new THREE.Vector3(WORLD_START, 0, 76)}
-        endPosition={new THREE.Vector3(WORLD_END, 0, 76)}
-      >
-        <BuildingSet />
-      </Spawner>
-      {/* Buildings Right */}
-      <Spawner
-        spawnInterval={3.6}
-        duration={WORLD_DURATION}
-        startPosition={new THREE.Vector3(WORLD_START, 0, -76)}
-        endPosition={new THREE.Vector3(WORLD_END, 0, -76)}
-      >
-        <BuildingSet />
-      </Spawner>
-    </Canvas>
+        {/* City blocks */}
+        {[1, -1].map((side) => (
+          <Spawner
+            key={side}
+            spawnInterval={BLOCK_INTERVAL}
+            duration={WORLD_DURATION}
+            offset={side === 1 ? 0 : BLOCK_INTERVAL / 2}
+            startPosition={v(WORLD_START, side * BUILDINGS_Z)}
+            endPosition={v(WORLD_END, side * BUILDINGS_Z)}
+          >
+            <BuildingSet />
+          </Spawner>
+        ))}
+      </Canvas>
+    </div>
   )
 }
