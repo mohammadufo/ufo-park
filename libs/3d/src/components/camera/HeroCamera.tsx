@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { MathUtils } from 'three'
-import { PerspectiveCamera } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { radians } from '../../util'
 
@@ -21,17 +21,39 @@ export interface HeroCameraProps {
   focusX?: number
   /** Same idea vertically on narrow screens. */
   focusY?: number
-  /** How strongly the camera follows the pointer. 0 disables it. */
-  parallax?: number
-  /** Ease closer to the road as the page scrolls. */
-  scrollZoom?: boolean
+  /**
+   * Drag to orbit, wheel to zoom (once armed), slow auto-orbit when idle.
+   * When false the camera drifts on its own and follows the pointer, which
+   * suits touch screens where a drag must scroll the page.
+   */
+  interactive?: boolean
+  /** Fires when wheel-zoom is armed (scene clicked) or disarmed. */
+  onZoomArmedChange?: (armed: boolean) => void
+  /** Turns off auto-orbit and drift, e.g. for prefers-reduced-motion. */
+  still?: boolean
 }
 
-/**
- * A cinematic, non-interactive camera: slow drift, pointer parallax and a
- * gentle push-in on scroll. It never captures wheel or touch events, so the
- * page scrolls normally over the canvas.
- */
+/** How long wheel-zoom stays armed without any activity over the scene. */
+const ZOOM_IDLE_MS = 4000
+/** How long after the last drag the auto-orbit picks up again. */
+const AUTO_ROTATE_RESUME_MS = 3500
+
+const spherical = (
+  target: THREE.Vector3,
+  polar: number,
+  azimuth: number,
+  distance: number,
+  out = new THREE.Vector3(),
+) => {
+  const p = radians(polar)
+  const a = radians(azimuth)
+  return out.set(
+    target.x + Math.sin(p) * Math.cos(a) * distance,
+    target.y + Math.cos(p) * distance,
+    target.z + Math.sin(p) * Math.sin(a) * distance,
+  )
+}
+
 export const HeroCamera = ({
   target = [0, 0, 4],
   distance = 160,
@@ -40,37 +62,21 @@ export const HeroCamera = ({
   fov = 40,
   focusX = 0.17,
   focusY = 0.14,
-  parallax = 1,
-  scrollZoom = true,
+  interactive = true,
+  onZoomArmedChange,
+  still = false,
 }: HeroCameraProps) => {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
   const size = useThree((state) => state.size)
-  const pointer = useRef({ x: 0, y: 0 })
-  const scroll = useRef(0)
-  const current = useRef({ polar, azimuth, distance })
-  const settled = useRef(false)
+  const portrait = size.width < size.height
+  const startDistance = distance * (portrait ? 1.3 : 1)
   const lookAt = useRef(new THREE.Vector3(...target))
-
-  useEffect(() => {
-    const onPointer = (event: PointerEvent) => {
-      pointer.current.x = (event.clientX / window.innerWidth) * 2 - 1
-      pointer.current.y = (event.clientY / window.innerHeight) * 2 - 1
-    }
-    const onScroll = () => {
-      scroll.current = MathUtils.clamp(
-        window.scrollY / window.innerHeight,
-        0,
-        1,
-      )
-    }
-    onScroll()
-    window.addEventListener('pointermove', onPointer, { passive: true })
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('pointermove', onPointer)
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [])
+  // Only the first framing: after that the rig (or the visitor) owns the camera.
+  const initialPosition = useMemo(
+    () => spherical(lookAt.current, polar, azimuth, startDistance),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
 
   // Frame the focal point beside the copy (wide) or below it (narrow).
   useLayoutEffect(() => {
@@ -85,53 +91,174 @@ export const HeroCamera = ({
     camera.updateProjectionMatrix()
   }, [size, focusX, focusY])
 
-  useFrame((state, delta) => {
-    const camera = cameraRef.current
-    if (!camera) return
+  return (
+    <>
+      <PerspectiveCamera
+        ref={cameraRef}
+        makeDefault
+        fov={fov}
+        near={1}
+        far={1200}
+        position={initialPosition}
+      />
+      {interactive ? (
+        <InteractiveRig
+          target={lookAt.current}
+          distance={startDistance}
+          onZoomArmedChange={onZoomArmedChange}
+          still={still}
+        />
+      ) : (
+        <CinematicRig
+          target={lookAt.current}
+          polar={polar}
+          azimuth={azimuth}
+          distance={startDistance}
+          still={still}
+        />
+      )}
+    </>
+  )
+}
 
-    const t = state.clock.elapsedTime
-    const portrait = size.width < size.height
-    const goal = {
-      azimuth:
-        azimuth + Math.sin(t * 0.06) * 6 + pointer.current.x * 7 * parallax,
-      polar:
-        polar +
-        Math.sin(t * 0.045) * 2 +
-        pointer.current.y * 3 * parallax -
-        scroll.current * 8,
-      distance:
-        distance *
-        (portrait ? 1.3 : 1) *
-        (scrollZoom ? 1 - scroll.current * 0.22 : 1),
+/**
+ * OrbitControls with page-friendly defaults: dragging always orbits, but the
+ * wheel only zooms after the visitor clicks into the scene, so scrolling past
+ * the hero keeps working. Leaving the scene, or a few idle seconds, disarms it.
+ */
+const InteractiveRig = ({
+  target,
+  distance,
+  onZoomArmedChange,
+  still,
+}: {
+  target: THREE.Vector3
+  distance: number
+  onZoomArmedChange?: (armed: boolean) => void
+  still: boolean
+}) => {
+  // OrbitControls listens (and captures the pointer) on R3F's event source, so
+  // watch the same element: the canvas itself sees a "leave" on every drag.
+  const surface = useThree(
+    (state) =>
+      (state.events.connected as HTMLElement | undefined) ??
+      state.gl.domElement,
+  )
+  const [zoomArmed, setZoomArmed] = useState(false)
+  const [autoRotate, setAutoRotate] = useState(!still)
+  const idleTimer = useRef<ReturnType<typeof setTimeout>>()
+  const resumeTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(
+    () => onZoomArmedChange?.(zoomArmed),
+    [zoomArmed, onZoomArmedChange],
+  )
+  useEffect(() => setAutoRotate(!still), [still])
+
+  useEffect(() => {
+    const disarm = () => {
+      clearTimeout(idleTimer.current)
+      setZoomArmed(false)
     }
+    const keepAlive = () => {
+      clearTimeout(idleTimer.current)
+      idleTimer.current = setTimeout(disarm, ZOOM_IDLE_MS)
+    }
+    const arm = () => {
+      setZoomArmed(true)
+      keepAlive()
+    }
+    surface.addEventListener('pointerdown', arm)
+    surface.addEventListener('pointermove', keepAlive)
+    surface.addEventListener('wheel', keepAlive, { passive: true })
+    surface.addEventListener('pointerleave', disarm)
+    return () => {
+      surface.removeEventListener('pointerdown', arm)
+      surface.removeEventListener('pointermove', keepAlive)
+      surface.removeEventListener('wheel', keepAlive)
+      surface.removeEventListener('pointerleave', disarm)
+      clearTimeout(idleTimer.current)
+      clearTimeout(resumeTimer.current)
+    }
+  }, [surface])
 
-    // Snap on the first frame so a single (reduced-motion) frame is framed right.
-    const step = settled.current ? Math.min(delta, 0.1) : 100
-    settled.current = true
+  return (
+    <OrbitControls
+      makeDefault
+      target={target}
+      enablePan={false}
+      enableZoom={zoomArmed}
+      enableDamping
+      dampingFactor={0.08}
+      rotateSpeed={0.6}
+      zoomSpeed={0.8}
+      minDistance={Math.min(45, distance)}
+      maxDistance={Math.max(280, distance)}
+      minPolarAngle={0}
+      maxPolarAngle={radians(62)}
+      autoRotate={autoRotate}
+      autoRotateSpeed={0.35}
+      onStart={() => {
+        clearTimeout(resumeTimer.current)
+        setAutoRotate(false)
+      }}
+      onEnd={() => {
+        if (still) return
+        resumeTimer.current = setTimeout(
+          () => setAutoRotate(true),
+          AUTO_ROTATE_RESUME_MS,
+        )
+      }}
+    />
+  )
+}
+
+/** Hands-off camera: slow drift and a little pointer parallax. */
+const CinematicRig = ({
+  target,
+  polar,
+  azimuth,
+  distance,
+  still,
+}: {
+  target: THREE.Vector3
+  polar: number
+  azimuth: number
+  distance: number
+  still: boolean
+}) => {
+  const camera = useThree((state) => state.camera)
+  const pointer = useRef({ x: 0, y: 0 })
+  const current = useRef({ polar, azimuth })
+
+  useEffect(() => {
+    const onPointer = (event: PointerEvent) => {
+      pointer.current.x = (event.clientX / window.innerWidth) * 2 - 1
+      pointer.current.y = (event.clientY / window.innerHeight) * 2 - 1
+    }
+    window.addEventListener('pointermove', onPointer, { passive: true })
+    return () => window.removeEventListener('pointermove', onPointer)
+  }, [])
+
+  useFrame((state, delta) => {
+    const t = still ? 0 : state.clock.elapsedTime
+    const step = Math.min(delta, 0.1)
     const c = current.current
-    c.azimuth = MathUtils.damp(c.azimuth, goal.azimuth, 2.2, step)
-    c.polar = MathUtils.damp(c.polar, goal.polar, 2.2, step)
-    c.distance = MathUtils.damp(c.distance, goal.distance, 2.2, step)
-
-    const p = radians(c.polar)
-    const a = radians(c.azimuth)
-    const target = lookAt.current
-    camera.position.set(
-      target.x + Math.sin(p) * Math.cos(a) * c.distance,
-      target.y + Math.cos(p) * c.distance,
-      target.z + Math.sin(p) * Math.sin(a) * c.distance,
+    c.azimuth = MathUtils.damp(
+      c.azimuth,
+      azimuth + Math.sin(t * 0.06) * 8 + pointer.current.x * 7,
+      2.2,
+      step,
     )
+    c.polar = MathUtils.damp(
+      c.polar,
+      polar + Math.sin(t * 0.045) * 3 + pointer.current.y * 3,
+      2.2,
+      step,
+    )
+    spherical(target, c.polar, c.azimuth, distance, camera.position)
     camera.lookAt(target)
   })
 
-  return (
-    <PerspectiveCamera
-      ref={cameraRef}
-      makeDefault
-      fov={fov}
-      near={1}
-      far={1200}
-      position={[60, 165, 60]}
-    />
-  )
+  return null
 }
