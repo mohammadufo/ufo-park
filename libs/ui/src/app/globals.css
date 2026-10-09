@@ -26,3 +26,19 @@
     8px -8px,
     -8px 0px;
 }
+
+/* Speech bubbles above the cars in the 3D city scene */
+@keyframes ufo-comment-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

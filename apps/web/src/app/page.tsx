@@ -1,26 +1,26 @@
-'use client'
-import { CarScene } from '@ufopark/3d/src/scenes/CarScene'
-import { IconSearch } from '@tabler/icons-react'
-import Link from 'next/link'
+import { Metadata } from 'next'
+import { Hero } from './_landing/Hero'
+import { HowItWorks } from './_landing/HowItWorks'
+import { Features } from './_landing/Features'
+import { BookingJourney } from './_landing/BookingJourney'
+import { Partners } from './_landing/Partners'
+import { FinalCta, Footer } from './_landing/Closing'
+
+export const metadata: Metadata = {
+  title: { absolute: 'UFO Park — Book parking before you get there' },
+}
 
 export default function Home() {
   return (
-    <main className="h-[calc(100vh-4rem)] ">
-      <div className="absolute top-16 bottom-0 left-0 right-0">
-        <CarScene />
-      </div>
-      <div className="flex flex-col items-start space-y-2 font-black text-8xl">
-        <div className="z-10 inline-block px-3 bg-primary mt-2">Need</div>{' '}
-        <div className="z-10 inline-block w-full max-w-md px-3 bg-primary ">
-          parking?
-        </div>
-        <Link
-          href="/search"
-          className="z-10 flex items-center gap-2 px-3 py-2 text-xl font-medium text-black underline underline-offset-4 bg-primary"
-        >
-          <IconSearch /> Search now
-        </Link>
-      </div>
+    // The root layout wraps pages in a Container; the landing page runs edge to edge.
+    <main style={{ marginInline: 'calc(50% - 50vw)' }}>
+      <Hero />
+      <HowItWorks />
+      <Features />
+      <BookingJourney />
+      <Partners />
+      <FinalCta />
+      <Footer />
     </main>
   )
 }
