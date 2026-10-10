@@ -74,13 +74,14 @@ yarn dev
 
 ## Deploying the API
 
-The repo includes a Render Blueprint (`render.yaml`) for the API.
+The API runs on Vercel as a single Vercel Function (`apps/api/vercel.json`), which works on the free Hobby plan.
 
 1. In Neon, copy two connection strings: the **pooled** one (host contains `-pooler`) and the **direct** one (without `-pooler`). Drop `&channel_binding=require`, add `&connect_timeout=15` to both, and add `&pgbouncer=true` to the pooled one.
-2. In Render: **New → Blueprint**, pick this repo, and fill in the variables from `apps/api/.env.example` (`DATABASE_URL` = pooled, `DIRECT_URL` = direct).
-3. The build runs `prisma migrate deploy`, so the tables are created on the first deploy.
-4. Optional demo data: from your machine, with `DATABASE_URL` and `DIRECT_URL` pointing at Neon, run `cd apps/api && npx prisma db seed`.
-5. In the Next.js apps, set `NEXT_PUBLIC_API_URL` to the Render URL and `NEXTAUTH_SECRET` to the same value as the API's `JWT_SECRET`.
+2. In Vercel: **Add New → Project**, import this repo, set **Root Directory** to `apps/api` and **Framework Preset** to **Other**. Leave the build settings alone; `vercel.json` provides them.
+3. Add the environment variables from `apps/api/.env.example` (`DATABASE_URL` = pooled, `DIRECT_URL` = direct), plus `HUSKY=0`, then deploy.
+4. The build runs `prisma migrate deploy`, so the tables are created on the first deploy.
+5. Optional demo data: from your machine, with `DATABASE_URL` and `DIRECT_URL` pointing at Neon, run `cd apps/api && npx prisma db seed`.
+6. In the Next.js apps, set `NEXT_PUBLIC_API_URL` to the API's Vercel URL and `NEXTAUTH_SECRET` to the same value as the API's `JWT_SECRET`.
 
 ## License
 
