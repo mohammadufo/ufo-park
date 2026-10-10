@@ -1,55 +1,151 @@
+'use client'
+import { useEffect, useRef, useState } from 'react'
+import { Phone, SCREENS } from './PhoneScreens'
 import { wrap } from './shared'
 
 const STEPS = [
   {
     title: 'Search where you’re going',
-    body: 'Enter an address and the times you’ll arrive and leave. The map only shows garages with a slot free for that whole window.',
+    body: 'Type an address or move the map, then set when you’ll arrive and leave. Only garages with a slot free for that whole window show up, each with its hourly price on the pin.',
   },
   {
-    title: 'Book the slot that fits',
-    body: 'Filter by vehicle type, price per hour and slot size. You see the total before you pay, and checkout runs through Stripe.',
+    title: 'Pick the slot that fits',
+    body: 'Compare slot types, prices and sizes side by side. A van never gets sent to a space built for a hatchback.',
+  },
+  {
+    title: 'Pay once, before you leave',
+    body: 'See the full total, valet trips included, then pay on Stripe’s secure checkout. The moment it goes through, the slot is yours.',
   },
   {
     title: 'Drive in, or hand over the keys',
-    body: 'Show your booking’s passcode at the garage. Or add a valet who picks your car up and brings it back where you choose.',
+    body: 'Show your six-digit passcode at the garage. Or let a valet collect the car and bring it back, and watch every handover land on the booking’s timeline.',
   },
 ]
 
-export const HowItWorks = () => (
-  <section id="how-it-works" className="scroll-mt-16 bg-canvas py-24 lg:py-32">
-    <div className={wrap}>
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
-        <h2 className="max-w-xl font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">
-          From address to parked in three steps
-        </h2>
-        <p className="max-w-md text-lg leading-relaxed text-fg-muted lg:justify-self-end">
-          You can do all of it from the couch, before you pick up your keys.
-        </p>
-      </div>
+/**
+ * Scroll-told walkthrough: the steps scroll past on the left while a phone
+ * stays pinned on the right and swaps to the screen for the step in view.
+ */
+export const HowItWorks = () => {
+  const [active, setActive] = useState(0)
+  const steps = useRef<Array<HTMLLIElement | null>>([])
 
-      {/* Painted like a row of parking bays along a curb */}
-      <ol className="mt-16 grid border-t-2 border-fg/20 md:grid-cols-3">
-        {STEPS.map(({ title, body }, i) => (
-          <li
-            key={title}
-            className="group relative border-l-2 border-fg/15 px-6 pb-12 pt-10 md:last:border-r-2"
-          >
-            <div
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActive(Number((entry.target as HTMLElement).dataset.step))
+          }
+        }
+      },
+      // A thin band across the middle of the viewport decides the step.
+      { rootMargin: '-45% 0px -45% 0px' },
+    )
+    steps.current.forEach((step) => step && observer.observe(step))
+    return () => observer.disconnect()
+  }, [])
+
+  const Screen = SCREENS[active]
+
+  return (
+    <section
+      id="how-it-works"
+      className="scroll-mt-16 overflow-x-clip bg-canvas py-24 lg:py-32"
+    >
+      <div className={wrap}>
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
+          <h2 className="max-w-xl font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">
+            From address to parked in four steps
+          </h2>
+          <p className="max-w-md text-lg leading-relaxed text-fg-muted lg:justify-self-end">
+            All of it happens on your phone, before you pick up your keys.
+          </p>
+        </div>
+
+        <div className="mt-16 grid gap-16 lg:grid-cols-[1fr_auto] lg:gap-24">
+          <ol className="relative">
+            {/* Progress rail */}
+            <span
               aria-hidden
-              className="bg-lamp pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className="absolute bottom-0 left-[1.4rem] top-0 hidden w-0.5 bg-line lg:block"
             />
-            <span className="relative block font-display text-7xl font-black leading-none text-primary">
-              {i + 1}
-            </span>
-            <h3 className="relative mt-8 font-display text-xl font-bold tracking-tight">
-              {title}
-            </h3>
-            <p className="relative mt-3 max-w-sm leading-relaxed text-fg-muted">
-              {body}
-            </p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </section>
-)
+            <span
+              aria-hidden
+              className="absolute left-[1.4rem] top-0 hidden w-0.5 bg-primary transition-[height] duration-500 ease-out lg:block"
+              style={{ height: `${((active + 1) / STEPS.length) * 100}%` }}
+            />
+            {STEPS.map(({ title, body }, i) => {
+              const StepScreen = SCREENS[i]
+              const current = i === active
+              return (
+                <li
+                  key={title}
+                  data-step={i}
+                  ref={(element) => {
+                    steps.current[i] = element
+                  }}
+                  className="relative flex flex-col gap-8 pb-16 lg:min-h-[70vh] lg:justify-center lg:pb-0 lg:pl-20"
+                >
+                  <div className="flex items-start gap-5 lg:block">
+                    <span
+                      className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center font-display text-xl font-black transition-all duration-500 lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 ${
+                        current
+                          ? 'bg-primary text-black shadow-glow'
+                          : 'border-2 border-line-strong bg-canvas text-fg-subtle'
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div
+                      className={`max-w-md transition-opacity duration-500 ${
+                        current ? 'lg:opacity-100' : 'lg:opacity-35'
+                      }`}
+                    >
+                      <h3 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
+                        {title}
+                      </h3>
+                      <p className="mt-3 text-lg leading-relaxed text-fg-muted">
+                        {body}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Small screens: each step brings its own phone */}
+                  <div className="flex justify-center lg:hidden">
+                    <Phone className="scale-[0.88] origin-top -mb-16">
+                      <StepScreen />
+                    </Phone>
+                  </div>
+                </li>
+              )
+            })}
+          </ol>
+
+          <div className="hidden lg:block">
+            <div className="sticky top-[calc(50vh-300px+2rem)]">
+              <div
+                aria-hidden
+                className="bg-lamp absolute -inset-24 -z-10 opacity-80"
+              />
+              <Phone>
+                <div key={active} className="h-full animate-screen-in">
+                  <Screen />
+                </div>
+              </Phone>
+              <div className="mt-6 flex justify-center gap-2" aria-hidden>
+                {STEPS.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1 transition-all duration-500 ${
+                      i === active ? 'w-8 bg-primary' : 'w-3 bg-line-strong'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

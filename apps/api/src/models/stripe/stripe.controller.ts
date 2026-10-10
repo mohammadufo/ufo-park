@@ -42,10 +42,33 @@ export class StripeController {
     const session =
       await this.stripeService.stripe.checkout.sessions.retrieve(sessionId)
 
-    const { bookingData } = session.metadata
+    // Only a paid checkout may create a booking. Without this check anyone
+    // could create bookings from an abandoned session id.
+    if (session.payment_status !== 'paid') {
+      return res.redirect(
+        process.env.STRIPE_CANCEL_URL || process.env.BOOKINGS_REDIRECT_URL,
+      )
+    }
 
-    const bookingInput: CreateBookingInput = JSON.parse(bookingData)
-    await this.bookingService.create(bookingInput)
+    const bookingInput: CreateBookingInput = JSON.parse(
+      session.metadata.bookingData,
+    )
+
+    // Stripe can send the customer here more than once (refresh, back
+    // button). Don't create the same booking twice.
+    const [existing] = await this.bookingService.findAll({
+      where: {
+        customerId: { equals: bookingInput.customerId },
+        vehicleNumber: { equals: bookingInput.vehicleNumber },
+        startTime: { equals: new Date(bookingInput.startTime).toISOString() },
+        endTime: { equals: new Date(bookingInput.endTime).toISOString() },
+      },
+      take: 1,
+    })
+
+    if (!existing) {
+      await this.bookingService.create(bookingInput)
+    }
     res.redirect(process.env.BOOKINGS_REDIRECT_URL)
   }
 }

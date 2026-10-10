@@ -66,6 +66,10 @@ export const animationConfig = {
   'fade-up': 'fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both',
   'lane-flow': 'lane-flow 1.2s linear infinite',
   shimmer: 'shimmer 1.6s linear infinite',
+  marquee: 'marquee 80s linear infinite',
+  'marquee-reverse': 'marquee 90s linear infinite reverse',
+  'ping-slow': 'ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite',
+  'screen-in': 'screen-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both',
   'spin-reverse': 'reverse-spin 1s linear infinite',
   'spin-slow': 'spin 3s linear infinite',
   'spin-12': 'spin 12s linear infinite',
@@ -90,6 +94,14 @@ export const keyframesConfig = {
     '0%': { transform: 'translateY(0)', opacity: '0' },
     '30%': { opacity: '1' },
     '100%': { transform: 'translateY(10px)', opacity: '0' },
+  },
+  marquee: {
+    from: { transform: 'translateX(0)' },
+    to: { transform: 'translateX(-50%)' },
+  },
+  'screen-in': {
+    from: { opacity: '0', transform: 'translateY(10px) scale(0.98)' },
+    to: { opacity: '1', transform: 'translateY(0) scale(1)' },
   },
   'fade-up': {
     from: { opacity: '0', transform: 'translateY(14px)' },
