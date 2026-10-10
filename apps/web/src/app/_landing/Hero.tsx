@@ -11,7 +11,8 @@ export const Hero = () => (
     <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-black/20 to-black/70 lg:bg-gradient-to-r lg:from-black/80 lg:via-black/30 lg:to-transparent" />
 
     <div
-      className={`${wrap} relative z-20 flex h-full flex-col justify-start pt-12 md:justify-center md:pt-0`}
+      // Lets drags on empty space and on the copy reach the 3D scene below.
+      className={`${wrap} pointer-events-none relative z-20 flex h-full flex-col justify-start pt-12 md:justify-center md:pt-0`}
     >
       <h1 className="flex flex-col items-start gap-2 text-6xl font-black leading-none tracking-tight text-black sm:text-7xl lg:text-8xl">
         <span className="bg-primary px-3 pb-2 pt-1">Need</span>
@@ -23,7 +24,7 @@ export const Hero = () => (
         you need. Drive straight in, or have a valet park it for you.
       </p>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3">
+      <div className="pointer-events-auto mt-8 flex flex-wrap items-center gap-3 self-start">
         <Link
           href="/search"
           className={`inline-flex items-center gap-2 bg-primary px-5 py-3 font-semibold text-black transition-colors hover:bg-primary-300 focus-visible:outline-primary ${focusRing}`}
@@ -41,7 +42,9 @@ export const Hero = () => (
     </div>
 
     {/* Legend for the scene behind the copy */}
-    <div className={`${wrap} absolute inset-x-0 bottom-0 z-20 pb-6`}>
+    <div
+      className={`${wrap} pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-6`}
+    >
       <ul className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-100">
         <li className="flex items-center gap-2">
           <span className="h-2.5 w-5 bg-primary" />
