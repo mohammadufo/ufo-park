@@ -38,7 +38,10 @@ const MAX_AGE = 24 * 60 * 60
       driver: ApolloDriver,
       introspection: true,
       fieldResolverEnhancers: ['guards'],
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      // Vercel's filesystem is read-only, so keep the schema in memory there.
+      autoSchemaFile: process.env.VERCEL
+        ? true
+        : join(process.cwd(), 'src/schema.gql'),
       // buildSchemaOptions: {
       //   numberScalarMode: 'integer',
       // },
