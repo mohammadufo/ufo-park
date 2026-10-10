@@ -39,10 +39,11 @@ export const generateSlots = ({ type }: Pick<Slot, 'type'>) => {
   const slots = []
   const ranges = slotRanges[type]
 
+  // length, width and height are Int columns, so round them.
   const count = randomRange(ranges.count.min, ranges.count.max)
-  const length = randomRange(ranges.length.min, ranges.length.max)
-  const width = randomRange(ranges.width.min, ranges.width.max)
-  const height = randomRange(ranges.height.min, ranges.height.max)
+  const length = Math.round(randomRange(ranges.length.min, ranges.length.max))
+  const width = Math.round(randomRange(ranges.width.min, ranges.width.max))
+  const height = Math.round(randomRange(ranges.height.min, ranges.height.max))
   const pricePerHour = Math.floor(
     randomRange(ranges.pricePerHour.min, ranges.pricePerHour.max),
   )
