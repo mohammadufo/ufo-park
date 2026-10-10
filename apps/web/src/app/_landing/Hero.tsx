@@ -4,8 +4,9 @@ import { buttonStyles } from '@ufopark/ui/src/components/atoms/Button'
 import { HeroScene } from './HeroScene'
 import { ScrollCue } from './ScrollCue'
 import { wrap } from './shared'
+import type { NetworkStats } from './network'
 
-export const Hero = () => (
+export const Hero = ({ stats }: { stats?: NetworkStats | null }) => (
   <section className="relative isolate h-[calc(100svh-4rem)] min-h-[38rem] overflow-hidden bg-canvas">
     <HeroScene />
 
@@ -17,6 +18,24 @@ export const Hero = () => (
       // Lets drags on empty space and on the copy reach the 3D scene below.
       className={`${wrap} pointer-events-none relative z-20 flex h-full flex-col justify-start pt-12 md:justify-center md:pt-0`}
     >
+      {stats ? (
+        <p className="glass mb-6 inline-flex animate-fade-up items-center gap-2.5 self-start px-3 py-1.5 text-xs font-medium text-fg-muted">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75 motion-reduce:hidden" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+          </span>
+          <span>
+            <span className="font-semibold text-fg">
+              {stats.garages.length} garages
+            </span>{' '}
+            and{' '}
+            <span className="font-semibold text-fg">
+              {stats.totalSlots} slots
+            </span>{' '}
+            bookable right now
+          </span>
+        </p>
+      ) : null}
       <h1 className="flex animate-fade-up flex-col items-start gap-2 font-display text-6xl font-black leading-[0.95] tracking-tight text-black sm:text-7xl lg:text-8xl">
         <span className="bg-primary px-3 pb-1.5 pt-2.5 shadow-glow">Need</span>
         <span className="bg-primary px-3 pb-1.5 pt-2.5 shadow-glow">

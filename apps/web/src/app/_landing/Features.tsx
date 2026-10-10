@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react'
 import { ReactNode } from 'react'
 import { PasscodeDemo } from './PasscodeDemo'
+import { SpotlightGlow, SpotlightGroup } from './Spotlight'
 import { wrap } from './shared'
 
 const Tile = ({
@@ -23,9 +24,11 @@ const Tile = ({
   fill?: boolean
 }) => (
   <article
+    data-spotlight
     className={`group relative flex flex-col overflow-hidden border border-line bg-surface transition-colors duration-300 hover:border-primary/40 ${className}`}
   >
-    <div className="p-6 sm:p-7">
+    <SpotlightGlow />
+    <div className="relative p-6 sm:p-7">
       <h3 className="font-display text-xl font-bold tracking-tight">{title}</h3>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-fg-muted">
         {body}
@@ -179,7 +182,7 @@ export const Features = () => (
         </p>
       </div>
 
-      <div className="mt-14 grid gap-4 lg:grid-cols-6">
+      <SpotlightGroup className="mt-14 grid gap-4 lg:grid-cols-6">
         <Tile
           className="lg:col-span-4 lg:row-span-2"
           fill
@@ -216,7 +219,7 @@ export const Features = () => (
         >
           <PasscodeDemo />
         </Tile>
-      </div>
+      </SpotlightGroup>
     </div>
   </section>
 )
