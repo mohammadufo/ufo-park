@@ -7,13 +7,15 @@ export type HtmlLabelProps = HTMLProps<HTMLLabelElement> & {
 }
 
 export const HtmlLabel = React.forwardRef<HTMLLabelElement, HtmlLabelProps>(
-  ({ children, title, optional, error, className }, ref) => (
-    <label ref={ref} className={` text-sm block select-none ${className}`}>
-      <div className="flex items-baseline justify-between">
-        <div className="mb-1 font-semibold capitalize">{title}</div>
-        <div className="text-xs text-gray-600 ">
-          {optional ? '(optional)' : null}
-        </div>
+  ({ children, title, optional, error, className = '' }, ref) => (
+    <label ref={ref} className={`block select-none text-sm ${className}`}>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <span className="font-semibold text-fg-muted first-letter:uppercase">
+          {title}
+        </span>
+        {optional ? (
+          <span className="text-xs text-fg-subtle">Optional</span>
+        ) : null}
       </div>
       {children}
       <FormError error={error} />

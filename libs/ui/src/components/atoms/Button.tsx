@@ -1,11 +1,13 @@
 import { IconRotateClockwise2 } from '@tabler/icons-react'
 
 type ButtonSizes = 'none' | 'sm' | 'md' | 'lg' | 'xl'
+type ButtonVariant = 'contained' | 'outlined' | 'text'
+type ButtonColor = 'primary' | 'success' | 'error' | 'white' | 'black'
 
 export type IButtonProps = {
   size?: ButtonSizes
-  variant?: 'contained' | 'outlined' | 'text'
-  color?: 'primary' | 'success' | 'error' | 'white' | 'black'
+  variant?: ButtonVariant
+  color?: ButtonColor
   fullWidth?: boolean
   loading?: boolean
 } & React.DetailedHTMLProps<
@@ -13,39 +15,62 @@ export type IButtonProps = {
   HTMLButtonElement
 >
 
-const variantColor = {
+// "black" means "high contrast": black on light pages, white on dark ones.
+const variantColor: Record<ButtonVariant, Record<ButtonColor, string>> = {
   contained: {
     primary:
-      'text-black bg-primary border-2 border-primary enabled:hover:bg-primary-600',
-    white: 'text-black bg-white',
-    black: 'text-primary bg-black enabled:hover:bg-gray-900',
-    success: 'text-white bg-green enabled:hover:bg-green-700',
-    error: 'text-white bg-red enabled:hover:bg-red-700',
+      'bg-primary text-black enabled:hover:bg-primary-300 enabled:hover:shadow-glow-sm [&:not(button)]:hover:bg-primary-300 [&:not(button)]:hover:shadow-glow-sm',
+    white: 'bg-white text-black enabled:hover:bg-gray-25',
+    black:
+      'bg-fg text-canvas enabled:hover:bg-fg/85 [&:not(button)]:hover:bg-fg/85',
+    success: 'bg-success text-white enabled:hover:brightness-110',
+    error: 'bg-danger text-white enabled:hover:brightness-110',
   },
-
   outlined: {
-    primary: 'border-2 border-primary text-black enabled:hover:bg-black/10',
-    white: 'border-2 border-white text-white enabled:hover:bg-white/10',
-    black: 'border-2 border-black text-black enabled:hover:bg-black/10',
-    success: 'border-2 border-green text-green enabled:hover:bg-green-100',
-    error: 'border-2 border-red text-red enabled:hover:bg-red-100',
+    primary:
+      'border border-primary text-fg enabled:hover:bg-primary/10 [&:not(button)]:hover:bg-primary/10',
+    white:
+      'border border-white/40 text-white enabled:hover:border-white enabled:hover:bg-white/10 [&:not(button)]:hover:border-white',
+    black:
+      'border border-line-strong text-fg enabled:hover:border-fg/50 enabled:hover:bg-fg/5 [&:not(button)]:hover:border-fg/50 [&:not(button)]:hover:bg-fg/5',
+    success: 'border border-success text-success enabled:hover:bg-success/10',
+    error: 'border border-danger text-danger enabled:hover:bg-danger/10',
   },
   text: {
-    primary: 'text-primary-800 ',
-    white: 'text-white',
-    black: 'text-black',
-    success: 'text-green ',
-    error: 'text-red ',
+    primary: 'text-fg enabled:hover:bg-fg/5',
+    white: 'text-white enabled:hover:bg-white/10',
+    black: 'text-fg enabled:hover:bg-fg/5',
+    success: 'text-success enabled:hover:bg-success/10',
+    error: 'text-danger enabled:hover:bg-danger/10',
   },
 }
 
-const sizes: { [key in ButtonSizes]: string } = {
+const sizes: Record<ButtonSizes, string> = {
   none: 'text-xs',
-  sm: 'px-3 py-1.5 text-xs',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-5 py-2 text-base',
-  xl: 'px-8 py-3 text-xl',
+  sm: 'h-8 px-3 text-xs',
+  md: 'h-10 px-4 text-sm',
+  lg: 'h-12 px-5 text-base',
+  xl: 'h-14 px-7 text-lg',
 }
+
+/** Button look for things that are not <button>, e.g. a Next.js <Link>. */
+export const buttonStyles = ({
+  size = 'md',
+  variant = 'contained',
+  color = 'primary',
+  fullWidth = false,
+}: {
+  size?: ButtonSizes
+  variant?: ButtonVariant
+  color?: ButtonColor
+  fullWidth?: boolean
+} = {}) =>
+  [
+    'relative inline-flex select-none items-center justify-center gap-2 rounded-none font-semibold transition-[background-color,border-color,color,box-shadow,filter] duration-200 active:translate-y-px',
+    sizes[size],
+    variantColor[variant][color],
+    fullWidth ? 'w-full' : '',
+  ].join(' ')
 
 export const Button = ({
   size = 'md',
@@ -54,34 +79,35 @@ export const Button = ({
   fullWidth = false,
   disabled = false,
   children,
-  className,
+  className = '',
   loading = false,
   type = 'button',
   ...props
 }: IButtonProps) => {
-  const variantCls = variantColor[variant][color]
-  //   variant === 'text' ? sizes.none :
-  const sizeCls = sizes[size]
-
-  const fwCls = fullWidth && 'w-full'
-  const disCls = (disabled || loading) && 'opacity-60 cursor-auto'
+  const disabledCls =
+    disabled || loading
+      ? 'cursor-not-allowed opacity-50 active:translate-y-0'
+      : ''
 
   return (
     <button
       type={type}
       disabled={disabled || loading}
-      className={`rounded relative font-medium ${sizeCls} ${fwCls} ${variantCls} ${disCls}  ${className} `}
+      aria-busy={loading || undefined}
+      className={`${buttonStyles({ size, variant, color, fullWidth })} ${disabledCls} ${className}`}
       {...props}
     >
       {loading ? (
         <>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <IconRotateClockwise2 className="w-5 h-5 animate-spin" />
-          </div>
-          <div className="opacity-10">{children}</div>
+          <span className="absolute inset-0 flex items-center justify-center">
+            <IconRotateClockwise2 className="h-5 w-5 animate-spin" />
+          </span>
+          <span className="invisible inline-flex items-center gap-2">
+            {children}
+          </span>
         </>
       ) : (
-        <>{children}</>
+        children
       )}
     </button>
   )

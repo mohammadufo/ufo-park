@@ -2,14 +2,17 @@ import { ReactNode } from 'react'
 
 export interface IBrandIconProps {
   children?: ReactNode
+  className?: string
 }
 
+/** A parking bay with a little car easing into it. */
 export const BrandIcon = ({
-  children = <div className="bg-gray-100 shadow w-2 h-4 animate-park-car" />,
+  children = <div className="h-4 w-2 bg-fg animate-park-car" />,
+  className = '',
 }: IBrandIconProps) => {
   return (
-    <div className="inline-block overflow-hidden">
-      <div className="flex items-center justify-center border-2 border-primary w-4 h-6">
+    <div className={`inline-block shrink-0 overflow-hidden ${className}`}>
+      <div className="flex h-6 w-4 items-center justify-center border-2 border-primary">
         {children}
       </div>
     </div>

@@ -24,11 +24,11 @@ export const IconType = ({
   time: string
   className?: string
 }) => {
-  const date = new Date(time)
-  const hour = date.getHours() // get the hour in UTC
+  const hour = new Date(time).getHours() // local hour
+  const cls = `h-5 w-5 ${className ?? ''}`
 
-  if (hour >= 4 && hour < 10) return <IconSunrise className="w-5 h-5" />
-  if (hour >= 10 && hour < 16) return <IconSun className="w-5 h-5" />
-  if (hour >= 16 && hour < 20) return <IconSunset className="w-5 h-5" />
-  return <IconMoonStars className={`w-5 h-5 ${className}`} />
+  if (hour >= 4 && hour < 10) return <IconSunrise className={cls} />
+  if (hour >= 10 && hour < 16) return <IconSun className={cls} />
+  if (hour >= 16 && hour < 20) return <IconSunset className={cls} />
+  return <IconMoonStars className={cls} />
 }

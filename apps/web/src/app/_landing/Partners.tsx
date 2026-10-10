@@ -1,10 +1,11 @@
-import { IconBuildingWarehouse, IconRoute } from '@tabler/icons-react'
-import { MANAGER_APP_URL, VALET_APP_URL, focusRing, wrap } from './shared'
+import { IconBuildingWarehouse, IconSteeringWheel } from '@tabler/icons-react'
+import { MANAGER_APP_URL, VALET_APP_URL, wrap } from './shared'
 
 const AUDIENCES = [
   {
     Icon: IconBuildingWarehouse,
     title: 'For garage owners',
+    body: 'Turn empty bays into bookings.',
     points: [
       'List your garage with its photos, address and a description.',
       'Add slots in bulk with their size, vehicle type and hourly price.',
@@ -14,8 +15,9 @@ const AUDIENCES = [
     cta: 'Open the manager app',
   },
   {
-    Icon: IconRoute,
+    Icon: IconSteeringWheel,
     title: 'For valets',
+    body: 'Pick up trips when it suits you.',
     points: [
       'See pickup and drop-off trips waiting near you.',
       'Take the trips that suit you and get directions to each car.',
@@ -27,21 +29,29 @@ const AUDIENCES = [
 ]
 
 export const Partners = () => (
-  <section className="bg-white py-24 lg:py-32">
+  <section className="border-t border-line bg-surface-sunken py-24 lg:py-32">
     <div className={wrap}>
-      <h2 className="max-w-2xl text-4xl font-black leading-tight tracking-tight sm:text-5xl">
+      <h2 className="max-w-2xl font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">
         Have spaces to fill, or time to drive?
       </h2>
 
-      <div className="mt-14 grid gap-12 md:grid-cols-2 md:gap-16">
-        {AUDIENCES.map(({ Icon, title, points, href, cta }) => (
-          <div key={title} className="border-l-4 border-primary pl-6">
-            <Icon size={28} stroke={1.5} />
-            <h3 className="mt-4 text-2xl font-bold tracking-tight">{title}</h3>
-            <ul className="mt-5 space-y-3 leading-relaxed text-gray-600">
+      <div className="mt-14 grid gap-4 md:grid-cols-2">
+        {AUDIENCES.map(({ Icon, title, body, points, href, cta }) => (
+          <div
+            key={title}
+            className="group relative border border-line bg-surface p-7 transition-colors duration-300 hover:border-primary/40 sm:p-9"
+          >
+            <span className="flex h-12 w-12 items-center justify-center bg-primary text-black">
+              <Icon size={26} stroke={1.75} />
+            </span>
+            <h3 className="mt-6 font-display text-2xl font-bold tracking-tight">
+              {title}
+            </h3>
+            <p className="mt-1 text-fg-muted">{body}</p>
+            <ul className="mt-6 space-y-3 border-t border-line pt-6 leading-relaxed text-fg-muted">
               {points.map((point) => (
                 <li key={point} className="flex gap-3">
-                  <span className="mt-2.5 h-1.5 w-1.5 shrink-0 bg-black" />
+                  <span className="mt-2.5 h-1.5 w-1.5 shrink-0 bg-primary" />
                   {point}
                 </li>
               ))}
@@ -49,7 +59,7 @@ export const Partners = () => (
             {href ? (
               <a
                 href={href}
-                className={`mt-6 inline-block font-semibold underline decoration-primary decoration-4 underline-offset-8 hover:decoration-black ${focusRing}`}
+                className="mt-7 inline-block font-semibold underline decoration-primary decoration-2 underline-offset-8 transition-colors hover:text-primary"
               >
                 {cta}
               </a>

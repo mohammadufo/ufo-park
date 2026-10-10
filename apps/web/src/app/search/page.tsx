@@ -4,8 +4,10 @@ import { FormProviderSearchGarage } from '@ufopark/forms/src/searchGarages'
 
 export default function Page() {
   return (
-    <FormProviderSearchGarage>
-      <SearchPage />
-    </FormProviderSearchGarage>
+    <main className="relative">
+      <FormProviderSearchGarage>
+        <SearchPage />
+      </FormProviderSearchGarage>
+    </main>
   )
 }

@@ -15,20 +15,22 @@ export const Reveal = ({
 
   return (
     <button
-      className={`flex flex-col items-center gap-2 ${className}`}
+      type="button"
+      aria-pressed={revealed}
+      className={`flex flex-col items-start gap-1.5 ${className ?? ''}`}
       onClick={() => setRevealed((state) => !state)}
     >
       <span
-        className={`text-lg tracking-wider w-full border px-1 ${
+        className={`w-full border px-2 py-1 font-display text-lg font-extrabold tracking-[0.2em] transition-colors duration-300 ${
           revealed
-            ? 'bg-white   shadow-sm '
-            : 'bg-checker border-white  text-transparent'
+            ? 'border-primary bg-primary/10 text-fg'
+            : 'bg-checker border-line-strong text-transparent opacity-50'
         }`}
       >
         {secret}
       </span>
       {showIntruction ? (
-        <span className="text-xs text-gray-600">
+        <span className="text-xs text-fg-subtle">
           {revealed ? 'Hide' : 'Tap to reveal'}
         </span>
       ) : null}

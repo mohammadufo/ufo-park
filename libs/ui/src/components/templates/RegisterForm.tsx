@@ -35,12 +35,13 @@ export const RegisterForm = ({ className, role }: ISignupFormProps) => {
           },
         })
 
-        if (errors) {
-          alert(errors)
+        if (errors?.length) {
+          toast(`We couldn’t create the account: ${errors[0].message}`)
+          return
         }
 
         if (data) {
-          toast(`User ${data.registerWithCredentials.uid} created. 🎉`)
+          toast('Account created. Logging you in…')
           signIn('credentials', {
             email: formData.email,
             password: formData.password,
@@ -49,44 +50,41 @@ export const RegisterForm = ({ className, role }: ISignupFormProps) => {
         }
       })}
     >
+      <HtmlLabel title="Your name" error={errors.name?.message}>
+        <HtmlInput
+          autoComplete="name"
+          placeholder="How should we greet you?"
+          {...register('name')}
+        />
+      </HtmlLabel>
       <HtmlLabel title="Email" error={errors.email?.message}>
         <HtmlInput
-          className="text-black"
-          placeholder="Enter the email."
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
           {...register('email')}
         />
       </HtmlLabel>
       <HtmlLabel title="Password" error={errors.password?.message}>
         <HtmlInput
-          className="text-black"
           type="password"
-          placeholder="······"
+          autoComplete="new-password"
+          placeholder="At least 6 characters"
           {...register('password')}
         />
       </HtmlLabel>
-      <HtmlLabel title="Display name" error={errors.name?.message}>
-        <HtmlInput
-          className="text-black"
-          placeholder="Enter your name."
-          {...register('name')}
-        />
-      </HtmlLabel>
-      {Object.keys(errors).length ? (
-        <div className="text-xs text-gray-600">
-          Please fix the above {Object.keys(errors).length} errors
-        </div>
-      ) : null}
-      <Button type="submit" fullWidth loading={loading}>
-        Register
+      <Button type="submit" size="lg" fullWidth loading={loading}>
+        Create account
       </Button>
-      <div className="mt-4 text-sm ">
-        Already have an UFOPark account?
-        <br />
-        <Link href="/login" className="font-bold underline underline-offset-4">
-          Login
+      <p className="text-sm text-fg-muted">
+        Already have an account?{' '}
+        <Link
+          href="/login"
+          className="font-semibold text-fg underline decoration-primary decoration-2 underline-offset-4 hover:decoration-fg"
+        >
+          Log in
         </Link>
-        now.
-      </div>
+      </p>
     </Form>
   )
 }

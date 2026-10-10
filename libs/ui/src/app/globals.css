@@ -5,26 +5,303 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------------ */
+/* Theme tokens                                                              */
+/* Light is the default (manager, valet and admin apps). The customer site   */
+/* sets `.theme-dark` on <html>. Values are "R G B" so Tailwind can add      */
+/* opacity, e.g. bg-surface/70.                                              */
+/* ------------------------------------------------------------------------ */
+
+:root {
+  --primary-rgb: 255 221 0;
+  --on-primary: 0 0 0;
+
+  --canvas: 240 240 239;
+  --surface: 255 255 255;
+  --surface-raised: 255 255 255;
+  --surface-sunken: 245 245 243;
+  --fg: 18 18 17;
+  --fg-muted: 82 82 78;
+  --fg-subtle: 128 128 122;
+  --line: 226 226 222;
+  --line-strong: 196 196 190;
+  --danger: 220 48 30;
+  --success: 22 140 70;
+
+  color-scheme: light;
+}
+
+.theme-dark {
+  /* Night asphalt, lane-paint white and signal yellow */
+  --canvas: 10 10 9;
+  --surface: 19 19 17;
+  --surface-raised: 27 27 25;
+  --surface-sunken: 14 14 13;
+  --fg: 244 244 240;
+  --fg-muted: 170 170 162;
+  --fg-subtle: 116 116 110;
+  --line: 40 40 37;
+  --line-strong: 64 64 60;
+  --danger: 255 92 74;
+  --success: 74 222 128;
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Base                                                                      */
+/* ------------------------------------------------------------------------ */
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: rgb(var(--canvas));
+    color: rgb(var(--fg));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display, inherit);
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: rgb(var(--primary-rgb));
+    color: rgb(var(--on-primary));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--primary-rgb));
+    outline-offset: 2px;
+  }
+
+  .theme-dark ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .theme-dark ::-webkit-scrollbar-track {
+    background: rgb(var(--canvas));
+  }
+  .theme-dark ::-webkit-scrollbar-thumb {
+    background: rgb(var(--line-strong));
+    border: 2px solid rgb(var(--canvas));
+  }
+  .theme-dark ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--fg-subtle));
+  }
+
+  input[type='datetime-local']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Brand utilities                                                           */
+/* ------------------------------------------------------------------------ */
+
+@layer components {
+  /* Frosted panel floating over the map or the 3D city */
+  .glass {
+    background-color: rgb(var(--surface) / 0.72);
+    border: 1px solid rgb(var(--line-strong) / 0.6);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* Dashed lane paint, used as a divider */
+  .lane {
+    height: 2px;
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--fg) / 0.22) 0 14px,
+      transparent 14px 28px
+    );
+    background-size: 28px 2px;
+  }
+  .lane-primary {
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--primary-rgb)) 0 14px,
+      transparent 14px 28px
+    );
+  }
+
+  /* Faint city-map grid for empty areas */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(rgb(var(--fg) / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--fg) / 0.045) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* Soft yellow light spilling from above, like a street lamp */
+  .bg-lamp {
+    background-image: radial-gradient(
+      60% 50% at 50% 0%,
+      rgb(var(--primary-rgb) / 0.14),
+      transparent 70%
+    );
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgb(var(--surface-raised)) 0%,
+      rgb(var(--line)) 50%,
+      rgb(var(--surface-raised)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  .bg-checker {
+    background-image:
+      linear-gradient(45deg, rgb(var(--fg)) 25%, transparent 25%),
+      linear-gradient(-45deg, rgb(var(--fg)) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgb(var(--fg)) 75%),
+      linear-gradient(-45deg, transparent 75%, rgb(var(--fg)) 75%);
+    background-size: 1rem 1rem;
+    background-position:
+      0 0,
+      0 8px,
+      8px -8px,
+      -8px 0px;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Third-party skins: toasts, MUI controls, Mapbox                           */
+/* `html body` outranks the styles MUI injects at runtime.                    */
+/* ------------------------------------------------------------------------ */
+
 .Toastify__toast {
-  @apply rounded-none font-sans shadow-lg;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: rgb(var(--fg));
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--line-strong));
+  border-left: 3px solid rgb(var(--primary-rgb));
+  box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.5);
 }
-
+.Toastify__close-button {
+  color: rgb(var(--fg-muted));
+}
+.Toastify__progress-bar,
 .Toastify__progress-bar-theme--light {
-  background: #000;
-  @apply rounded-none;
+  background: rgb(var(--primary-rgb));
+  border-radius: 0;
 }
 
-.bg-checker {
-  background-image: linear-gradient(45deg, #000 25%, transparent 25%),
-    linear-gradient(-45deg, #000 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #000 75%),
-    linear-gradient(-45deg, transparent 75%, #000 75%);
-  background-size: 1rem 1rem;
-  background-position:
-    0 0,
-    0 8px,
-    8px -8px,
-    -8px 0px;
+html body .MuiPaginationItem-root {
+  border-radius: 0;
+  color: rgb(var(--fg-muted));
+  font-weight: 600;
+  font-family: inherit;
+}
+html body .MuiPaginationItem-root:hover {
+  background: rgb(var(--fg) / 0.08);
+}
+html body .MuiPaginationItem-root.Mui-selected {
+  background: rgb(var(--primary-rgb));
+  color: rgb(var(--on-primary));
+}
+
+html body .MuiSlider-root {
+  color: rgb(var(--primary-rgb));
+}
+html body .MuiSlider-rail {
+  background: rgb(var(--line-strong));
+  opacity: 1;
+}
+html body .MuiSlider-thumb {
+  border-radius: 0;
+  width: 16px;
+  height: 16px;
+  background: rgb(var(--primary-rgb));
+  box-shadow: 0 0 0 4px rgb(var(--primary-rgb) / 0.18);
+}
+html body .MuiSlider-valueLabel {
+  border-radius: 0;
+  background: rgb(var(--surface-raised));
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--line-strong));
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+html body .MuiToggleButton-root {
+  border-radius: 0;
+  color: rgb(var(--fg-muted));
+  border-color: rgb(var(--line-strong));
+}
+html body .MuiToggleButton-root.Mui-selected {
+  color: rgb(var(--on-primary));
+  background: rgb(var(--primary-rgb));
+  border-color: rgb(var(--primary-rgb));
+}
+
+html body .MuiTab-root {
+  font-family: inherit;
+  text-transform: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: rgb(var(--fg-subtle));
+}
+html body .MuiTab-root.Mui-selected {
+  color: rgb(var(--fg));
+}
+html body .MuiTabs-indicator {
+  background: rgb(var(--primary-rgb));
+  height: 3px;
+}
+
+html body .MuiAutocomplete-paper {
+  border-radius: 0;
+  margin-top: 6px;
+  background: rgb(var(--surface-raised) / 0.94);
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--line-strong));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 50px -20px rgb(0 0 0 / 0.6);
+}
+html body .MuiAutocomplete-option {
+  font-size: 0.875rem;
+}
+html body .MuiAutocomplete-option.Mui-focused,
+html body .MuiAutocomplete-option[aria-selected='true'] {
+  background: rgb(var(--primary-rgb) / 0.14);
+}
+html body .MuiAutocomplete-noOptions,
+html body .MuiAutocomplete-loading {
+  color: rgb(var(--fg-muted));
+  font-size: 0.875rem;
+}
+
+.theme-dark .mapboxgl-ctrl-attrib {
+  background: rgb(var(--canvas) / 0.6);
+}
+.theme-dark .mapboxgl-ctrl-attrib a {
+  color: rgb(var(--fg-subtle));
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
 }
 
 /* Speech bubbles above the cars in the 3D city scene */

@@ -1,13 +1,9 @@
 import { MouseEventHandler, ReactNode } from 'react'
-
 import { IconMinus, IconParking, IconPlus } from '@tabler/icons-react'
-
 import { useMap } from 'react-map-gl'
 
-export interface IZoomControlsProps {}
-
 const MapControls = ({ children }: { children: ReactNode }) => (
-  <div className="flex flex-col overflow-hidden gap-0.5 space-y rounded shadow-lg divide-primary-800 backdrop-blur-sm">
+  <div className="glass flex flex-col divide-y divide-line-strong shadow-panel">
     {children}
   </div>
 )
@@ -15,14 +11,18 @@ const MapControls = ({ children }: { children: ReactNode }) => (
 const ZoomControlButton = ({
   children,
   onClick,
+  label,
 }: {
   children: ReactNode
   onClick: MouseEventHandler<HTMLButtonElement>
+  label: string
 }) => (
   <button
-    className=" hover:bg-white bg-white/40"
+    className="flex h-10 w-10 items-center justify-center text-fg-muted transition-colors hover:bg-primary hover:text-black"
     type="button"
     onClick={onClick}
+    aria-label={label}
+    title={label}
   >
     {children}
   </button>
@@ -30,10 +30,9 @@ const ZoomControlButton = ({
 
 const ZoomIn = () => {
   const { current: map } = useMap()
-
   return (
-    <ZoomControlButton onClick={() => map?.zoomIn()}>
-      <IconPlus className="w-8 h-8 p-1.5 text-black" />
+    <ZoomControlButton label="Zoom in" onClick={() => map?.zoomIn()}>
+      <IconPlus className="h-5 w-5" />
     </ZoomControlButton>
   )
 }
@@ -41,8 +40,8 @@ const ZoomIn = () => {
 const ZoomOut = () => {
   const { current: map } = useMap()
   return (
-    <ZoomControlButton onClick={() => map?.zoomOut()}>
-      <IconMinus className="w-8 h-8 p-1.5 text-black" />
+    <ZoomControlButton label="Zoom out" onClick={() => map?.zoomOut()}>
+      <IconMinus className="h-5 w-5" />
     </ZoomControlButton>
   )
 }
@@ -57,12 +56,13 @@ export const CenterOfMap = ({
   const { current: map } = useMap()
   return (
     <ZoomControlButton
+      label="Use the center of the map"
       onClick={() => {
         const { lat, lng } = map?.getCenter() as { lng: number; lat: number }
         onClick({ lat, lng })
       }}
     >
-      <Icon className="w-8 h-8 p-1.5 text-black" />
+      <Icon className="h-5 w-5" />
     </ZoomControlButton>
   )
 }
