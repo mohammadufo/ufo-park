@@ -5,8 +5,7 @@ import {
 import { useState } from 'react'
 import { useFormContext, Controller } from 'react-hook-form'
 import { Button } from '../../atoms/Button'
-import { IconFilter } from '@tabler/icons-react'
-import { PulsingDot } from '../../atoms/Dot'
+import { IconAdjustmentsHorizontal } from '@tabler/icons-react'
 import { Sidebar } from '../Sidebar'
 import { RangeSlider } from '../../molecules/RangeSlider'
 import {
@@ -25,19 +24,31 @@ export const FilterSidebar = () => {
     formState: { dirtyFields },
   } = useFormContext<FormTypeSearchGarage>()
 
+  const activeFilters = ['types', 'pricePerHour', 'width', 'height', 'length']
+    .map((key) => key in dirtyFields)
+    .filter(Boolean).length
+
   return (
     <>
       <Button
         size="sm"
-        variant="text"
+        variant="outlined"
+        color="black"
         onClick={() => setOpen(true)}
-        className=" hover:bg-gray-200"
+        aria-label={
+          activeFilters ? `Filters, ${activeFilters} active` : 'Filters'
+        }
       >
-        <IconFilter className="stroke-1.5 text-black" />
-        {Object.values(dirtyFields).length ? <PulsingDot /> : null}
+        <IconAdjustmentsHorizontal className="h-4 w-4" />
+        Filters
+        {activeFilters ? (
+          <span className="flex h-4 min-w-[1rem] items-center justify-center bg-primary px-1 text-[10px] font-black text-black">
+            {activeFilters}
+          </span>
+        ) : null}
       </Button>
-      <Sidebar open={open} setOpen={setOpen} blur={false}>
-        <div className="flex flex-col items-start gap-3">
+      <Sidebar open={open} setOpen={setOpen} blur={false} title="Filters">
+        <div className="flex flex-1 flex-col gap-8">
           <Controller
             name="types"
             control={control}
@@ -47,7 +58,7 @@ export const FilterSidebar = () => {
               formState: { defaultValues },
             }) => {
               return (
-                <div>
+                <div className="w-full">
                   <FilterHeading dirty={isDirty} title="Vehicle type" />
                   <ToggleButtonGroup
                     value={value}
@@ -174,14 +185,19 @@ export const FilterSidebar = () => {
               )
             }}
           />
-          <Button
-            onClick={() =>
-              reset({ ...getValues(), ...formDefaultValuesSearchGarages })
-            }
-            disabled={!Object.values(dirtyFields).length}
-          >
-            Reset
-          </Button>
+          <div className="mt-auto grid grid-cols-2 gap-2 border-t border-line pt-4">
+            <Button
+              variant="outlined"
+              color="black"
+              onClick={() =>
+                reset({ ...getValues(), ...formDefaultValuesSearchGarages })
+              }
+              disabled={!activeFilters}
+            >
+              Clear all
+            </Button>
+            <Button onClick={() => setOpen(false)}>Show garages</Button>
+          </div>
         </div>
       </Sidebar>
     </>

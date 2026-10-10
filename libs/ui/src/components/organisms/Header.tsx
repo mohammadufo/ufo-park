@@ -1,11 +1,10 @@
 'use client'
 import { BaseComponent, MenuItem, Role } from '@ufopark/util/types'
-import { Brand } from '../atoms/Brand'
-import { Container } from '../atoms/Container'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Button } from '../atoms/Button'
-import { useDialogState } from '@ufopark/util/hooks/dialog'
+import { Brand } from '../atoms/Brand'
+import { Container } from '../atoms/Container'
+import { buttonStyles } from '../atoms/Button'
 import { NavSidebar } from './NavSidebar'
 import { Menus } from './Menus'
 
@@ -15,40 +14,44 @@ export type IHeaderProps = {
 } & BaseComponent
 
 export const Header = ({ type, menuItems }: IHeaderProps) => {
-  const session = useSession()
-  const uid = session?.data?.user?.uid
-  let [open, setOpen] = useDialogState(false)
+  const { data, status } = useSession()
+  const uid = data?.user?.uid
 
   return (
     <header>
-      <nav className="fixed z-40 top-0 w-full shadow-md bg-white/50 backdrop-blur-md">
-        <Container className="relative   flex items-center justify-between h-16 py-2 gap-16">
-          <Link href="/" aria-label="Home" className="w-auto z-50">
-            <Brand type={type} className="hidden h-10 sm:block" />
-            <Brand type={type} shortForm className="block sm:hidden" />
+      <nav className="glass fixed inset-x-0 top-0 z-40 border-x-0 border-t-0">
+        <Container className="flex h-16 items-center justify-between gap-6 px-4">
+          <Link href="/" aria-label="UFO Park home" className="shrink-0">
+            <Brand type={type} className="hidden sm:flex" />
+            <Brand type={type} shortForm className="sm:hidden" />
           </Link>
-          <div className="flex items-center gap-2">
-            {uid ? (
-              <div className="flex gap-6 items-center">
-                <div className="text-sm mr-6 flex gap-3">
-                  <Menus menuItems={menuItems} />
-                </div>
 
-                <NavSidebar menuItems={menuItems} />
+          {uid ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden items-center md:flex">
+                <Menus menuItems={menuItems} />
               </div>
-            ) : (
-              <>
-                <Link href="/register">
-                  <Button variant="outlined" className="hidden md:block">
-                    Register
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button>Log in</Button>
-                </Link>
-              </>
-            )}
-          </div>
+              <NavSidebar menuItems={menuItems} />
+            </div>
+          ) : status === 'loading' ? (
+            <div aria-hidden className="skeleton h-9 w-36" />
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/register"
+                className={`${buttonStyles({
+                  variant: 'text',
+                  color: 'black',
+                  size: 'sm',
+                })} hidden sm:inline-flex`}
+              >
+                Create account
+              </Link>
+              <Link href="/login" className={buttonStyles({ size: 'sm' })}>
+                Log in
+              </Link>
+            </div>
+          )}
         </Container>
       </nav>
       <div className="h-16" />

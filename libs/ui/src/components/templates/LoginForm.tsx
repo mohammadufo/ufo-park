@@ -37,43 +37,44 @@ export const LoginForm = ({ className }: ILoginFormProps) => {
         setLoading(false)
 
         if (result?.ok) {
-          toast(`welcome. 👋🏻`)
+          toast('You’re logged in.')
           replace('/')
         }
         if (result?.error) {
-          toast('Login failed. Try again.')
+          toast(
+            'That email and password don’t match. Check them and try again.',
+          )
         }
       })}
     >
       <HtmlLabel title="Email" error={errors.email?.message}>
         <HtmlInput
-          className="text-black"
+          type="email"
+          autoComplete="email"
           {...register('email')}
-          placeholder="email"
+          placeholder="you@example.com"
         />
       </HtmlLabel>
       <HtmlLabel title="Password" error={errors.password?.message}>
         <HtmlInput
-          className="text-black"
           type="password"
+          autoComplete="current-password"
           {...register('password')}
-          placeholder="******"
+          placeholder="Your password"
         />
       </HtmlLabel>
-      <Button type="submit" loading={loading}>
-        Submit
+      <Button type="submit" size="lg" fullWidth loading={loading}>
+        Log in
       </Button>
-      <div className="mt-4 text-sm">
-        Do not have an UFOPark account?
-        <br />
+      <p className="text-sm text-fg-muted">
+        New to UFO Park?{' '}
         <Link
           href="/register"
-          className="font-bold underline underline-offset-4"
+          className="font-semibold text-fg underline decoration-primary decoration-2 underline-offset-4 hover:decoration-fg"
         >
-          Create one
-        </Link>{' '}
-        now.
-      </div>
+          Create an account
+        </Link>
+      </p>
     </Form>
   )
 }

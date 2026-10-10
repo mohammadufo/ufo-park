@@ -1,4 +1,4 @@
-import { Inter } from 'next/font/google'
+import { Inter, Overpass } from 'next/font/google'
 import { ApolloProvider } from '@ufopark/network/src/config/apollo'
 import '@ufopark/ui/src/app/globals.css'
 import { SessionProvider } from '@ufopark/ui/src/components/molecules/SessionProvider'
@@ -6,9 +6,10 @@ import { Header } from '@ufopark/ui/src/components/organisms/Header'
 import { MenuItem } from '@ufopark/util/types'
 import { ToastContainer } from '@ufopark/ui/src/components/molecules/Toast'
 import { Metadata, Viewport } from 'next'
-import { Container } from '@ufopark/ui/src/components/atoms/Container'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+// Road-sign lettering for headings and numbers.
+const overpass = Overpass({ subsets: ['latin'], variable: '--font-display' })
 
 const description =
   'Find a garage near where you’re going, book a slot by the hour and drive straight in — or let a valet pick up and return your car.'
@@ -31,7 +32,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#ffdd00',
+  themeColor: '#0a0a09',
+  colorScheme: 'dark',
 }
 
 const MENUITEMS: MenuItem[] = [
@@ -46,12 +48,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="motion-safe:scroll-smooth">
+    <html
+      lang="en"
+      className={`theme-dark ${inter.variable} ${overpass.variable} motion-safe:scroll-smooth`}
+    >
       <SessionProvider>
         <ApolloProvider>
-          <body className={`${inter.className} bg-gray-25 overflow-x-clip`}>
+          <body className="overflow-x-clip font-sans">
             <Header menuItems={MENUITEMS} />
-            <Container>{children}</Container>
+            {children}
             <ToastContainer />
           </body>
         </ApolloProvider>

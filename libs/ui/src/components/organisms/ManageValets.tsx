@@ -7,7 +7,7 @@ import { Switch } from '../atoms/Switch'
 import { Marker } from './map/MapMarker'
 import { Map } from './map/Map'
 import { ParkingIcon } from '../atoms/ParkingIcon'
-import { IconUser } from '@tabler/icons-react'
+import { IconSteeringWheel, IconUser } from '@tabler/icons-react'
 import { Directions } from './Directions'
 import { Panel } from './map/Panel'
 import { DefaultZoomControls } from './map/ZoomControls'
@@ -30,11 +30,13 @@ export const ManageValets = ({
   }
 
   return (
-    <div className="p-2 space-y-3 bg-gray-25">
-      <div className="text-xl font-bold">Valet</div>
-      <p className="text-sm text-gray">
-        Our valets will whisk your car away to its reserved spot and bring it
-        back when you&apos;re ready. It&apos;s like magic, but with cars!
+    <div className="space-y-3 border border-line bg-surface-sunken p-4">
+      <div className="flex items-center gap-2 font-display text-lg font-extrabold">
+        <IconSteeringWheel className="h-5 w-5 text-primary" /> Valet
+      </div>
+      <p className="text-sm text-fg-muted">
+        A valet collects your car where you are, parks it, and brings it back
+        when you’re ready.
       </p>
 
       <Switch
@@ -58,16 +60,15 @@ export const ManageValets = ({
             })
           }
         }}
-        label={'Need valet?'}
+        label={'Add a valet'}
       />
 
       {showValet ? (
         <div>
-          <div className="mb-6 space-y-3">
-            <p className="text-sm text-gray">
-              Want your car delivered somewhere else? No problem! Choose a
-              different drop-off point and we&apos;ll make sure your ride is
-              there waiting for you.
+          <div className="mb-4 space-y-3">
+            <p className="text-sm text-fg-muted">
+              Drag the markers to set where the valet picks your car up and
+              where they bring it back.
             </p>
             <Switch
               checked={valet?.differentLocations || false}
@@ -76,7 +77,7 @@ export const ManageValets = ({
                 if (!e) {
                   setValue('valet.dropoffInfo', {
                     lat: valet?.pickupInfo?.lat || lat,
-                    lng: valet?.pickupInfo?.lng || lat,
+                    lng: valet?.pickupInfo?.lng || lng,
                   })
                 } else {
                   setValue('valet.dropoffInfo', {
@@ -85,7 +86,7 @@ export const ManageValets = ({
                   })
                 }
               }}
-              label={'Add a different drop off location?'}
+              label={'Return it somewhere else'}
             />
           </div>
           <Map
@@ -94,18 +95,19 @@ export const ManageValets = ({
               longitude: lng,
               zoom: 13,
             }}
-            height="50vh"
+            height="20rem"
           >
             <Panel position="right-center">
               <DefaultZoomControls />
             </Panel>
-            <Marker latitude={lat} longitude={lng}>
-              <ParkingIcon />
+            <Marker latitude={lat} longitude={lng} anchor="bottom">
+              <ParkingIcon active />
             </Marker>
             {valet?.pickupInfo?.lng && valet?.pickupInfo?.lat ? (
               <>
                 <Marker
                   pitchAlignment="auto"
+                  anchor="bottom"
                   longitude={valet?.pickupInfo?.lng}
                   latitude={valet?.pickupInfo?.lat}
                   draggable
@@ -119,11 +121,12 @@ export const ManageValets = ({
                     }
                   }}
                 >
-                  <div className="flex flex-col items-center">
-                    <IconUser />
-                    <span>
-                      Pickup {!valet.differentLocations ? '& drop off' : null}
+                  <div className="flex cursor-grab flex-col items-center">
+                    <span className="flex items-center gap-1 bg-black px-1.5 py-1 text-xs font-bold text-primary ring-1 ring-primary">
+                      <IconUser className="h-3.5 w-3.5" />
+                      {valet.differentLocations ? 'Pickup' : 'Pickup & return'}
                     </span>
+                    <span className="h-2 w-0.5 bg-primary" />
                   </div>
                 </Marker>
                 <Directions
@@ -146,6 +149,7 @@ export const ManageValets = ({
               <>
                 <Marker
                   pitchAlignment="auto"
+                  anchor="bottom"
                   longitude={valet.dropoffInfo.lng}
                   latitude={valet.dropoffInfo.lat}
                   draggable
@@ -155,9 +159,12 @@ export const ManageValets = ({
                     setValue('valet.dropoffInfo.lng', lng || 0)
                   }}
                 >
-                  <div className="flex flex-col items-center">
-                    <IconUser />
-                    <span>Drop off</span>
+                  <div className="flex cursor-grab flex-col items-center">
+                    <span className="flex items-center gap-1 bg-black px-1.5 py-1 text-xs font-bold text-primary ring-1 ring-primary">
+                      <IconUser className="h-3.5 w-3.5" />
+                      Return
+                    </span>
+                    <span className="h-2 w-0.5 bg-primary" />
                   </div>
                 </Marker>
                 <Directions

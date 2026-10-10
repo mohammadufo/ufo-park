@@ -1,7 +1,13 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useState } from 'react'
-import { IconRotate360, IconZoomIn } from '@tabler/icons-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  IconFocusCentered,
+  IconMinus,
+  IconPlus,
+  IconRotate360,
+} from '@tabler/icons-react'
+import type { HeroCameraApi } from '@ufopark/3d/src/components/camera/HeroCamera'
 
 // three.js is ~600 kB: load it after the page is interactive, never on the server.
 const HeroCanvas = dynamic(() => import('./HeroCanvas'), { ssr: false })
@@ -18,14 +24,39 @@ const useMediaQuery = (query: string) => {
   return matches
 }
 
+const ControlButton = ({
+  label,
+  onClick,
+  children,
+}: {
+  label: string
+  onClick: () => void
+  children: React.ReactNode
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={label}
+    title={label}
+    className="flex h-9 w-9 items-center justify-center text-fg-muted transition-colors hover:bg-primary hover:text-black"
+  >
+    {children}
+  </button>
+)
+
 export const HeroScene = () => {
   const [ready, setReady] = useState(false)
-  const [zoomArmed, setZoomArmed] = useState(false)
   const narrow = useMediaQuery('(max-width: 767px)')
   // Orbit with a mouse; on touch screens a drag has to keep scrolling the page.
   const finePointer = useMediaQuery('(hover: hover) and (pointer: fine)')
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const onReady = useCallback(() => setReady(true), [])
+  const camera = useRef<HeroCameraApi | null>(null)
+  const [modifier, setModifier] = useState('Ctrl')
+
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.platform)) setModifier('⌘')
+  }, [])
 
   return (
     <>
@@ -40,27 +71,48 @@ export const HeroScene = () => {
           interactive={finePointer}
           still={reducedMotion}
           onReady={onReady}
-          onZoomArmedChange={setZoomArmed}
+          apiRef={camera}
         />
       </div>
 
       {finePointer && ready ? (
-        <p
-          aria-hidden
-          className="pointer-events-none absolute bottom-6 right-4 z-20 hidden items-center gap-4 text-xs text-gray-100 sm:right-6 md:flex"
-        >
-          {zoomArmed ? (
-            <span className="flex items-center gap-1.5 bg-black/60 px-2.5 py-1.5 backdrop-blur-sm">
-              <IconZoomIn size={16} className="text-primary" />
-              Scroll to zoom. Move off the city to scroll the page.
+        <div className="absolute bottom-6 right-4 z-20 hidden animate-fade-up items-end gap-3 sm:right-6 md:flex">
+          <p className="glass pointer-events-none hidden items-center gap-2 px-3 py-2 text-xs text-fg-muted xl:flex">
+            <IconRotate360 size={16} className="text-primary" />
+            Drag to look around.
+            <span className="text-fg-subtle">
+              Zoom with{' '}
+              <kbd className="border border-line-strong px-1 font-sans text-[11px] text-fg">
+                {modifier}
+              </kbd>{' '}
+              + scroll or pinch.
             </span>
-          ) : (
-            <span className="flex items-center gap-1.5 bg-black/60 px-2.5 py-1.5 backdrop-blur-sm">
-              <IconRotate360 size={16} className="text-primary" />
-              Drag to look around, click and scroll to zoom
-            </span>
-          )}
-        </p>
+          </p>
+          <div
+            role="group"
+            aria-label="Camera"
+            className="glass flex flex-col divide-y divide-line-strong"
+          >
+            <ControlButton
+              label="Zoom in"
+              onClick={() => camera.current?.zoomIn()}
+            >
+              <IconPlus size={18} />
+            </ControlButton>
+            <ControlButton
+              label="Zoom out"
+              onClick={() => camera.current?.zoomOut()}
+            >
+              <IconMinus size={18} />
+            </ControlButton>
+            <ControlButton
+              label="Reset view"
+              onClick={() => camera.current?.reset()}
+            >
+              <IconFocusCentered size={18} />
+            </ControlButton>
+          </div>
+        </div>
       ) : null}
     </>
   )

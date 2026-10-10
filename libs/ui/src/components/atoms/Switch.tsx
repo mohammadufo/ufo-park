@@ -1,4 +1,4 @@
-import { Switch as HUISwitch, SwitchGroup, Label } from '@headlessui/react'
+import { Switch as HUISwitch, Field, Label } from '@headlessui/react'
 import { ReactNode } from 'react'
 
 export interface Switch2Props {
@@ -14,28 +14,30 @@ export const Switch = ({
   children,
   checked,
   onChange,
-  className,
+  className = '',
 }: Switch2Props) => {
   return (
-    <SwitchGroup>
-      <div className={`flex items-center ${className}`}>
-        <Label className="mr-2 text-sm">{label}</Label>
-        <HUISwitch
-          checked={checked}
-          onChange={onChange}
-          className={`${
-            checked ? 'bg-primary-600' : 'bg-gray-200'
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+    <Field className={`flex items-center justify-between gap-4 ${className}`}>
+      <Label className="cursor-pointer text-sm font-medium">{label}</Label>
+      <HUISwitch
+        checked={checked}
+        onChange={onChange}
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center border transition-colors duration-200 ${
+          checked
+            ? 'border-primary bg-primary'
+            : 'border-line-strong bg-surface-sunken'
+        }`}
+      >
+        <span
+          className={`inline-flex h-4 w-4 items-center justify-center transition-transform duration-200 ${
+            checked
+              ? 'translate-x-[22px] bg-black'
+              : 'translate-x-1 bg-fg-subtle'
+          }`}
         >
-          <span
-            className={`${
-              checked ? 'translate-x-6' : 'translate-x-1'
-            } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-          >
-            {children}
-          </span>
-        </HUISwitch>
-      </div>
-    </SwitchGroup>
+          {children}
+        </span>
+      </HUISwitch>
+    </Field>
   )
 }

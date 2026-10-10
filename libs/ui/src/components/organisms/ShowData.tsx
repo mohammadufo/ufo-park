@@ -25,7 +25,7 @@ export const ShowData = ({
   pagination,
   title,
   children,
-  childrenClassName = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3',
+  childrenClassName = 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
 }: ShowDataProps) => {
   const { setSkip, setTake, skip, take, resultCount, totalCount } = pagination
 
@@ -39,28 +39,32 @@ export const ShowData = ({
   const totalPages = Math.ceil((totalCount || 0) / take)
 
   return (
-    <div>
-      <h2 className="text-lg mb-1 font-semibold mt-2">{title}</h2>
+    <div className="mt-6">
+      {title ? (
+        <h2 className="mb-4 font-display text-xl font-extrabold">{title}</h2>
+      ) : null}
       {loading && <LoaderPanel />}
       {!loading && !error && resultCount === 0 && <NoResults />}
 
       {error && (
-        <AlertSection>
-          Oops. Something went wrong.
-          <span className="text-xs">Psst. {error}</span>
+        <AlertSection title="This list didn’t load">
+          <span>Check your connection and reload the page.</span>
+          <span className="text-xs text-fg-subtle">{error}</span>
         </AlertSection>
       )}
 
       <div className={childrenClassName}>{children}</div>
-      <div className="flex justify-center mt-8">
-        <Pagination
-          count={totalPages}
-          showFirstButton
-          showLastButton
-          page={skip / take + 1}
-          onChange={handlePageChange}
-        />
-      </div>
+      {totalPages > 1 ? (
+        <div className="mt-10 flex justify-center">
+          <Pagination
+            count={totalPages}
+            showFirstButton
+            showLastButton
+            page={skip / take + 1}
+            onChange={handlePageChange}
+          />
+        </div>
+      ) : null}
     </div>
   )
 }

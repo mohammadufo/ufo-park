@@ -1,5 +1,4 @@
 import { differenceInTime, getTimeUnits } from '@ufopark/util/date'
-import { IconArrowRightRhombus } from '@tabler/icons-react'
 import { format } from 'date-fns'
 
 export interface IDateCardProps {
@@ -8,15 +7,17 @@ export interface IDateCardProps {
 }
 
 export const StartEndDateCard = ({ startTime, endTime }: IDateCardProps) => {
-  const numOfHours = getTimeUnits(
+  const duration = getTimeUnits(
     differenceInTime({ startTime, endTime, unit: 'seconds' }),
   ).timeString
   return (
-    <div className="flex items-center justify-between gap-2 p-2">
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border border-line bg-surface-sunken px-4 py-3">
       <DateCard dateTime={startTime} />
-      <div className="flex flex-col items-center">
-        <IconArrowRightRhombus />
-        <div className="text-xs">{numOfHours}</div>
+      <div className="flex flex-col items-center gap-1">
+        <div className="lane lane-primary w-10" />
+        <div className="whitespace-nowrap text-xs font-semibold text-fg-muted">
+          {duration}
+        </div>
       </div>
       <DateCard dateTime={endTime} justify="right" />
     </div>
@@ -29,20 +30,15 @@ export const DateCard = ({
 }: {
   dateTime: string
   justify?: 'left' | 'right'
-}) => {
-  const [date, time] = [
-    format(new Date(dateTime), 'dd MMMM yyyy'),
-    format(new Date(dateTime), 'HH:mm'),
-  ]
-
-  return (
-    <div
-      className={`flex flex-col  ${
-        justify === 'left' ? 'items-start' : 'items-end'
-      }`}
-    >
-      <div className="text-xl">{time}</div>
-      <div className="text-xs text-gray-500">{date}</div>
+}) => (
+  <div
+    className={`flex flex-col ${justify === 'left' ? 'items-start' : 'items-end'}`}
+  >
+    <div className="font-display text-xl font-extrabold leading-none">
+      {format(new Date(dateTime), 'HH:mm')}
     </div>
-  )
-}
+    <div className="mt-1 text-xs text-fg-muted">
+      {format(new Date(dateTime), 'd MMM yyyy')}
+    </div>
+  </div>
+)

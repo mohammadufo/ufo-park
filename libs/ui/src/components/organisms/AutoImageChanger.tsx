@@ -32,8 +32,12 @@ export const AutoImageChanger = ({
 
   if (images.length === 0)
     return (
-      <div className="flex items-center justify-center w-full h-48 gap-2 text-sm bg-white border select-none border-gray-50 text-gray">
-        <IconPhotoCancel /> No images.
+      <div
+        className={`bg-blueprint flex w-full select-none items-center justify-center gap-2 bg-surface-sunken text-sm text-fg-subtle ${
+          aspectRatio === 'aspect-auto' ? 'h-48' : aspectRatio
+        }`}
+      >
+        <IconPhotoCancel className="h-5 w-5" /> No photos yet
       </div>
     )
 
@@ -41,42 +45,48 @@ export const AutoImageChanger = ({
     <div className={`relative w-full overflow-hidden ${aspectRatio}`}>
       <img
         src={images[currentImageIndex]}
-        alt="Garage"
+        alt=""
         className="object-cover h-full w-full"
       />
-      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-1 space-x-2">
-        {images.map((_, index) => (
-          <div
-            className={`h-2 rounded-full ${
-              currentImageIndex === index ? 'bg-white w-4' : 'bg-gray-300 w-2'
-            }`}
-            key={index}
-          />
-        ))}
-      </div>
+      {images.length > 1 ? (
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-1.5 p-2">
+          {images.map((_, index) => (
+            <div
+              className={`h-1 transition-all duration-300 ${
+                currentImageIndex === index
+                  ? 'w-6 bg-primary'
+                  : 'w-3 bg-white/60'
+              }`}
+              key={index}
+            />
+          ))}
+        </div>
+      ) : null}
       {images.length > 1 && (
         <>
           <button
             type="button"
-            className="absolute transform -translate-y-1/2 top-1/2 left-2"
+            aria-label="Previous photo"
+            className="absolute left-2 top-1/2 -translate-y-1/2"
             onClick={() =>
               setCurrentImageIndex((prevIndex) =>
                 prevIndex === 0 ? images.length - 1 : prevIndex - 1,
               )
             }
           >
-            <IconChevronLeft className="w-6 h-6 text-black rounded-full bg-white/40 hover:bg-white" />
+            <IconChevronLeft className="h-8 w-8 bg-black/50 p-1.5 text-white transition-colors hover:bg-primary hover:text-black" />
           </button>
           <button
             type="button"
-            className="absolute transform -translate-y-1/2 top-1/2 right-2"
+            aria-label="Next photo"
+            className="absolute right-2 top-1/2 -translate-y-1/2"
             onClick={() =>
               setCurrentImageIndex(
                 (prevIndex) => (prevIndex + 1) % images.length,
               )
             }
           >
-            <IconChevronRight className="w-6 h-6 text-black rounded-full bg-white/40 hover:bg-white" />
+            <IconChevronRight className="h-8 w-8 bg-black/50 p-1.5 text-white transition-colors hover:bg-primary hover:text-black" />
           </button>
         </>
       )}

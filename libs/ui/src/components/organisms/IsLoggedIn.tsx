@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react'
 import { LoaderPanel } from '../molecules/Loader'
 import { AlertSection } from '../molecules/AlertSection'
 import Link from 'next/link'
+import { buttonStyles } from '../atoms/Button'
 
 type RenderPropChild = (uid: string) => ReactNode
 
@@ -17,7 +18,7 @@ export const IsLoggedIn = ({
   const { status, data } = useSession()
 
   if (status === 'loading') {
-    return <LoaderPanel text="Loading user..." />
+    return <LoaderPanel />
   }
 
   if (!data?.user?.uid) {
@@ -25,8 +26,19 @@ export const IsLoggedIn = ({
       return <>{notLoggedIn}</>
     } else {
       return (
-        <AlertSection title="You are not logged in.">
-          <Link href="/login">Login</Link>
+        <AlertSection title="Log in to continue">
+          <span>This page needs your account.</span>
+          <div className="mt-2 flex gap-2">
+            <Link href="/login" className={buttonStyles()}>
+              Log in
+            </Link>
+            <Link
+              href="/register"
+              className={buttonStyles({ variant: 'outlined', color: 'black' })}
+            >
+              Create an account
+            </Link>
+          </div>
         </AlertSection>
       )
     }

@@ -62,6 +62,10 @@ const redPallete = {
 }
 
 export const animationConfig = {
+  'scroll-cue': 'scroll-cue 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite',
+  'fade-up': 'fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both',
+  'lane-flow': 'lane-flow 1.2s linear infinite',
+  shimmer: 'shimmer 1.6s linear infinite',
   'spin-reverse': 'reverse-spin 1s linear infinite',
   'spin-slow': 'spin 3s linear infinite',
   'spin-12': 'spin 12s linear infinite',
@@ -82,6 +86,23 @@ export const animationConfig = {
   'move-right-60': 'move-right 60s ease-in-out infinite',
 }
 export const keyframesConfig = {
+  'scroll-cue': {
+    '0%': { transform: 'translateY(0)', opacity: '0' },
+    '30%': { opacity: '1' },
+    '100%': { transform: 'translateY(10px)', opacity: '0' },
+  },
+  'fade-up': {
+    from: { opacity: '0', transform: 'translateY(14px)' },
+    to: { opacity: '1', transform: 'translateY(0)' },
+  },
+  'lane-flow': {
+    from: { backgroundPosition: '0 0' },
+    to: { backgroundPosition: '28px 0' },
+  },
+  shimmer: {
+    from: { backgroundPosition: '-200% 0' },
+    to: { backgroundPosition: '200% 0' },
+  },
   'reverse-spin': {
     from: {
       transform: 'rotate(360deg)',
@@ -160,28 +181,6 @@ export const keyframesConfig = {
   },
 }
 
-const template = {
-  DEFAULT: '40%',
-  25: '98%',
-  50: '95%',
-  100: '92%',
-  200: '86%',
-  300: '78%',
-  400: '66%',
-  500: '50%',
-  600: '36%',
-  700: '24%',
-  800: '12%',
-  900: '04%',
-}
-
-export const colorGen = ({ saturation = '100%', hue, lightness = template }) =>
-  Object.entries(lightness)
-    .map(([key, item]) => ({
-      [key]: `hsl(${hue}, ${saturation}, ${item})`,
-    }))
-    .reduce((obj, item) => Object.assign(obj, item), {})
-
 export const spacingConfig = {
   112: '28rem',
   128: '32rem',
@@ -190,8 +189,16 @@ export const spacingConfig = {
   192: '48rem',
 }
 
+/**
+ * Semantic colors resolve to CSS variables (see globals.css), so one set of
+ * components renders correctly in the light theme (default) and the dark
+ * theme (`.theme-dark` on <html>, used by the customer site).
+ */
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`
+
 export const colorsConfig = {
   transparent: colors.transparent,
+  current: 'currentColor',
   black: colors.black,
   white: colors.white,
   primary: primaryPallete,
@@ -199,4 +206,22 @@ export const colorsConfig = {
   green: greenPallete,
   gray: grayPallete,
   accent: colors.black,
+
+  canvas: token('canvas'),
+  surface: {
+    DEFAULT: token('surface'),
+    raised: token('surface-raised'),
+    sunken: token('surface-sunken'),
+  },
+  fg: {
+    DEFAULT: token('fg'),
+    muted: token('fg-muted'),
+    subtle: token('fg-subtle'),
+  },
+  line: {
+    DEFAULT: token('line'),
+    strong: token('line-strong'),
+  },
+  danger: token('danger'),
+  success: token('success'),
 }

@@ -5,7 +5,12 @@ import {
 } from 'react-toastify'
 
 export const ToastContainer = () => (
-  <ReactToastifyContainer transition={Slide} />
+  <ReactToastifyContainer
+    transition={Slide}
+    position="bottom-right"
+    hideProgressBar={false}
+    closeOnClick
+  />
 )
 
 export { toast }

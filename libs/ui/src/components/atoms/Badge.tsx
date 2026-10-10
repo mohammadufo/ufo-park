@@ -4,30 +4,33 @@ export interface IBadgeProps {
   children: ReactNode
   size?: 'sm' | 'md' | 'lg'
   variant?: 'primary' | 'gray' | 'red' | 'yellow' | 'green'
+  className?: string
 }
 
+const sizeCls = {
+  sm: 'px-1.5 py-0.5 text-[11px]',
+  md: 'px-2 py-1 text-xs',
+  lg: 'px-2.5 py-1 text-sm',
+}
+
+const variantCls = {
+  primary: 'bg-primary text-black',
+  yellow: 'bg-primary/15 text-fg ring-1 ring-inset ring-primary/40',
+  gray: 'bg-fg/10 text-fg-muted',
+  red: 'bg-danger/15 text-danger',
+  green: 'bg-success/15 text-success',
+}
+
+/** A small square plate, like the tag on a parking sign. */
 export const Badge = ({
   children,
   size = 'md',
   variant = 'gray',
-}: IBadgeProps) => {
-  const sizeCls = {
-    sm: 'px-2 text-xs',
-    md: 'px-2 py-1.5 text-sm',
-    lg: 'px-3 py-1.5',
-  }
-  const variantCls = {
-    primary: 'bg-primary-100 border border-white text-primary-900',
-    gray: 'bg-gray-100 border border-white text-gray-900',
-    red: 'bg-red-100 border border-white text-red-900',
-    yellow: 'bg-yellow-100 border border-white  text-yellow-900',
-    green: 'bg-green-100 border border-white  text-green-900',
-  }
-  return (
-    <span
-      className={`transition-all  py-1 px-2 items-center shadow justify-center duration-300  rounded-full ${sizeCls[size]} ${variantCls[variant]}`}
-    >
-      {children}
-    </span>
-  )
-}
+  className = '',
+}: IBadgeProps) => (
+  <span
+    className={`inline-flex items-center gap-1 whitespace-nowrap font-semibold leading-none ${sizeCls[size]} ${variantCls[variant]} ${className}`}
+  >
+    {children}
+  </span>
+)

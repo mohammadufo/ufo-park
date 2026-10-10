@@ -5,23 +5,18 @@ import { ShowCustomerBookings } from '../organisms/ShowCustomerBookings'
 import { BookingStatus } from '@ufopark/network/src/gql/generated'
 
 export const ListCustomerBookings = () => {
-  const [value, setValue] = useState<0 | 1>(1)
+  const [value, setValue] = useState<0 | 1>(0)
   return (
     <>
       <Tabs
         value={value}
         onChange={(e, v) => setValue(v)}
-        aria-label="bookings"
+        aria-label="Bookings"
       >
-        <Tab label={'PAST'} />
-        <Tab label={'ON GOING'} />
+        <Tab label="Upcoming and active" />
+        <Tab label="Past" />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <ShowCustomerBookings
-          statuses={[BookingStatus.CheckedOut, BookingStatus.ValetReturned]}
-        />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
         <ShowCustomerBookings
           statuses={[
             BookingStatus.Booked,
@@ -30,6 +25,11 @@ export const ListCustomerBookings = () => {
             BookingStatus.CheckedIn,
             BookingStatus.ValetAssignedForCheckOut,
           ]}
+        />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <ShowCustomerBookings
+          statuses={[BookingStatus.CheckedOut, BookingStatus.ValetReturned]}
         />
       </TabPanel>
     </>

@@ -19,7 +19,10 @@ export const SearchPlaceBox = ({
       isOptionEqualToValue={(option, value) =>
         option.placeName === value.placeName
       }
-      noOptionsText={searchText ? 'No options.' : 'Type something...'}
+      placeholder="Where are you going?"
+      noOptionsText={
+        searchText ? 'No places match that.' : 'Type an address or a place.'
+      }
       getOptionLabel={(x) => x.placeName}
       onInputChange={(_, v) => {
         setLoading(true)

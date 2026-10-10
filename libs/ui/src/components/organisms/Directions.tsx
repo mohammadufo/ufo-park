@@ -75,13 +75,24 @@ export const Directions = ({
 
   return (
     <Source id={sourceId} type="geojson" data={dataOne}>
+      {/* Dark casing keeps the yellow route readable on light and dark maps */}
+      <Layer
+        id={`${sourceId}-casing`}
+        type="line"
+        layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+        paint={{
+          'line-color': '#000000',
+          'line-opacity': 0.55,
+          'line-width': 7,
+        }}
+      />
       <Layer
         id={sourceId}
         type="line"
-        source="my-data"
+        layout={{ 'line-join': 'round', 'line-cap': 'round' }}
         paint={{
-          'line-color': 'rgb(0,0,0)',
-          'line-width': 2,
+          'line-color': '#ffdd00',
+          'line-width': 3.5,
         }}
       />
     </Source>

@@ -16,27 +16,23 @@ export interface IAccordionProps {
 export const Accordion = ({
   title,
   children,
-  className,
+  className = '',
   defaultOpen = false,
 }: IAccordionProps) => (
   <Disclosure defaultOpen={defaultOpen}>
     {({ open }) => (
       <>
         <DisclosureButton
-          className={`flex justify-between w-full py-2 font-medium ${className}`}
+          className={`flex w-full items-center justify-between gap-3 py-3 text-left ${className}`}
         >
-          <span
-            className={`text-left ${open ? 'font-semibold' : 'text-gray-600'}`}
-          >
-            {title}
-          </span>
+          <span className="min-w-0 flex-1">{title}</span>
           <IconChevronDown
-            className={` ${
-              open ? 'transform rotate-180' : 'text-gray-500'
-            } w-5 h-5 `}
+            className={`h-5 w-5 shrink-0 text-fg-subtle transition-transform duration-200 ${
+              open ? 'rotate-180 text-fg' : ''
+            }`}
           />
         </DisclosureButton>
-        <DisclosurePanel className="w-full px-2 pb-4 text-gray-600">
+        <DisclosurePanel className="w-full pb-4 text-sm text-fg-muted">
           {children}
         </DisclosurePanel>
       </>

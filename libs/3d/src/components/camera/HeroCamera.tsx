@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  MutableRefObject,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import * as THREE from 'three'
 import { MathUtils } from 'three'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
@@ -22,19 +29,17 @@ export interface HeroCameraProps {
   /** Same idea vertically on narrow screens. */
   focusY?: number
   /**
-   * Drag to orbit, wheel to zoom (once armed), slow auto-orbit when idle.
+   * Drag to orbit, Ctrl/⌘ + wheel or pinch to zoom, slow auto-orbit when idle.
    * When false the camera drifts on its own and follows the pointer, which
    * suits touch screens where a drag must scroll the page.
    */
   interactive?: boolean
-  /** Fires when wheel-zoom is armed (scene clicked) or disarmed. */
-  onZoomArmedChange?: (armed: boolean) => void
+  /** Receives zoom in/out/reset functions for on-screen buttons. */
+  apiRef?: MutableRefObject<HeroCameraApi | null>
   /** Turns off auto-orbit and drift, e.g. for prefers-reduced-motion. */
   still?: boolean
 }
 
-/** How long wheel-zoom stays armed without any activity over the scene. */
-const ZOOM_IDLE_MS = 4000
 /** How long after the last drag the auto-orbit picks up again. */
 const AUTO_ROTATE_RESUME_MS = 3500
 
@@ -63,7 +68,7 @@ export const HeroCamera = ({
   focusX = 0.17,
   focusY = 0.14,
   interactive = true,
-  onZoomArmedChange,
+  apiRef,
   still = false,
 }: HeroCameraProps) => {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
@@ -105,7 +110,7 @@ export const HeroCamera = ({
         <InteractiveRig
           target={lookAt.current}
           distance={startDistance}
-          onZoomArmedChange={onZoomArmedChange}
+          apiRef={apiRef}
           still={still}
         />
       ) : (
@@ -121,85 +126,155 @@ export const HeroCamera = ({
   )
 }
 
+/** Imperative handle for on-screen camera buttons. */
+export interface HeroCameraApi {
+  zoomIn: () => void
+  zoomOut: () => void
+  reset: () => void
+}
+
+const MIN_DISTANCE = 45
+const MAX_DISTANCE = 280
+const BUTTON_ZOOM = 1.35
+
 /**
- * OrbitControls with page-friendly defaults: dragging always orbits, but the
- * wheel only zooms after the visitor clicks into the scene, so scrolling past
- * the hero keeps working. Leaving the scene, or a few idle seconds, disarms it.
+ * OrbitControls tuned for a hero that sits above more page content.
+ *
+ * - Dragging orbits the city.
+ * - A plain mouse wheel is never captured, so the page always scrolls.
+ * - Zoom happens with Ctrl/⌘ + wheel, a trackpad pinch (browsers report it
+ *   as a wheel event with ctrlKey) or the on-screen buttons via `apiRef`.
  */
 const InteractiveRig = ({
   target,
   distance,
-  onZoomArmedChange,
+  apiRef,
   still,
 }: {
   target: THREE.Vector3
   distance: number
-  onZoomArmedChange?: (armed: boolean) => void
+  apiRef?: MutableRefObject<HeroCameraApi | null>
   still: boolean
 }) => {
-  // OrbitControls listens (and captures the pointer) on R3F's event source, so
-  // watch the same element: the canvas itself sees a "leave" on every drag.
+  // OrbitControls listens (and captures the pointer) on R3F's event source.
   const surface = useThree(
     (state) =>
       (state.events.connected as HTMLElement | undefined) ??
       state.gl.domElement,
   )
-  const [zoomArmed, setZoomArmed] = useState(false)
+  const camera = useThree((state) => state.camera)
+  const invalidate = useThree((state) => state.invalidate)
   const [autoRotate, setAutoRotate] = useState(!still)
-  const idleTimer = useRef<ReturnType<typeof setTimeout>>()
   const resumeTimer = useRef<ReturnType<typeof setTimeout>>()
+  const home = useMemo(() => camera.position.clone(), [camera])
+  const goal = useRef<{ distance?: number; position?: THREE.Vector3 }>({})
+  const offset = useMemo(() => new THREE.Vector3(), [])
 
-  useEffect(
-    () => onZoomArmedChange?.(zoomArmed),
-    [zoomArmed, onZoomArmedChange],
-  )
   useEffect(() => setAutoRotate(!still), [still])
 
   useEffect(() => {
-    const disarm = () => {
-      clearTimeout(idleTimer.current)
-      setZoomArmed(false)
+    const currentDistance = () => camera.position.distanceTo(target)
+    const zoomBy = (factor: number) => {
+      const from = goal.current.distance ?? currentDistance()
+      goal.current = {
+        distance: MathUtils.clamp(from * factor, MIN_DISTANCE, MAX_DISTANCE),
+      }
+      invalidate()
     }
-    const keepAlive = () => {
-      clearTimeout(idleTimer.current)
-      idleTimer.current = setTimeout(disarm, ZOOM_IDLE_MS)
+    if (apiRef) {
+      apiRef.current = {
+        zoomIn: () => zoomBy(1 / BUTTON_ZOOM),
+        zoomOut: () => zoomBy(BUTTON_ZOOM),
+        reset: () => {
+          goal.current = { position: home.clone() }
+          invalidate()
+        },
+      }
     }
-    const arm = () => {
-      setZoomArmed(true)
-      keepAlive()
+
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return // let the page scroll
+      event.preventDefault()
+      const lines = event.deltaMode === 1 ? 16 : 1
+      const delta = MathUtils.clamp(event.deltaY * lines, -120, 120)
+      zoomBy(Math.exp(delta * 0.004))
     }
-    surface.addEventListener('pointerdown', arm)
-    surface.addEventListener('pointermove', keepAlive)
-    surface.addEventListener('wheel', keepAlive, { passive: true })
-    surface.addEventListener('pointerleave', disarm)
+    // Safari reports trackpad pinches as gesture events instead.
+    let lastScale = 1
+    const onGestureStart = (event: Event) => {
+      event.preventDefault()
+      lastScale = 1
+    }
+    const onGestureChange = (event: Event) => {
+      event.preventDefault()
+      const scale = (event as Event & { scale?: number }).scale ?? 1
+      zoomBy(lastScale / scale)
+      lastScale = scale
+    }
+    surface.addEventListener('wheel', onWheel, { passive: false })
+    surface.addEventListener('gesturestart', onGestureStart)
+    surface.addEventListener('gesturechange', onGestureChange)
     return () => {
-      surface.removeEventListener('pointerdown', arm)
-      surface.removeEventListener('pointermove', keepAlive)
-      surface.removeEventListener('wheel', keepAlive)
-      surface.removeEventListener('pointerleave', disarm)
-      clearTimeout(idleTimer.current)
+      surface.removeEventListener('wheel', onWheel)
+      surface.removeEventListener('gesturestart', onGestureStart)
+      surface.removeEventListener('gesturechange', onGestureChange)
       clearTimeout(resumeTimer.current)
+      if (apiRef) apiRef.current = null
     }
-  }, [surface])
+  }, [surface, camera, target, home, apiRef, invalidate])
+
+  // Ease towards the requested zoom or the reset position.
+  useFrame((_, delta) => {
+    const step = Math.min(delta, 0.1)
+    const { distance: toDistance, position: toPosition } = goal.current
+    if (toPosition) {
+      camera.position.x = MathUtils.damp(
+        camera.position.x,
+        toPosition.x,
+        5,
+        step,
+      )
+      camera.position.y = MathUtils.damp(
+        camera.position.y,
+        toPosition.y,
+        5,
+        step,
+      )
+      camera.position.z = MathUtils.damp(
+        camera.position.z,
+        toPosition.z,
+        5,
+        step,
+      )
+      if (camera.position.distanceTo(toPosition) < 0.2) goal.current = {}
+      invalidate()
+    } else if (toDistance !== undefined) {
+      offset.copy(camera.position).sub(target)
+      const next = MathUtils.damp(offset.length(), toDistance, 7, step)
+      camera.position.copy(target).add(offset.setLength(next))
+      if (Math.abs(next - toDistance) < 0.05) goal.current = {}
+      invalidate()
+    }
+  })
 
   return (
     <OrbitControls
       makeDefault
       target={target}
       enablePan={false}
-      enableZoom={zoomArmed}
+      enableZoom={false}
       enableDamping
       dampingFactor={0.08}
       rotateSpeed={0.6}
-      zoomSpeed={0.8}
-      minDistance={Math.min(45, distance)}
-      maxDistance={Math.max(280, distance)}
+      minDistance={Math.min(MIN_DISTANCE, distance)}
+      maxDistance={Math.max(MAX_DISTANCE, distance)}
       minPolarAngle={0}
       maxPolarAngle={radians(62)}
       autoRotate={autoRotate}
       autoRotateSpeed={0.35}
       onStart={() => {
         clearTimeout(resumeTimer.current)
+        goal.current = {}
         setAutoRotate(false)
       }}
       onEnd={() => {
