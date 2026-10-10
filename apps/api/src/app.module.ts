@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { join } from 'path'
 import { ConfigModule } from '@nestjs/config'
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { JwtModule } from '@nestjs/jwt'
 import { AdminsModule } from './models/admins/admins.module'
 import { CustomersModule } from './models/customers/customers.module'
@@ -37,6 +38,11 @@ const MAX_AGE = 24 * 60 * 60
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       introspection: true,
+      // Show Apollo Sandbox at /graphql in every environment. Without it,
+      // production disables the landing page and a browser visit to
+      // /graphql only gets Apollo's CSRF error.
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
       fieldResolverEnhancers: ['guards'],
       // Vercel's filesystem is read-only, so keep the schema in memory there.
       autoSchemaFile: process.env.VERCEL
